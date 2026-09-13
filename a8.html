@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第8課 ことばカード</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-deep:#F3ECDD;
+    --ink:#2A241C;
+    --seal:#A2403B;
+    --indigo:#33506A;
+    --gold:#B4893F;
+    --line:#DED2B6;
+  }
+  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .serif{ font-family:'Shippori Mincho', serif; }
+  .paper-texture{
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(180,137,63,0.05), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(51,80,106,0.05), transparent 45%);
+  }
+  .scene{ perspective:1600px; }
+  .flip-card{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:6px;
+  }
+  .face-back{ transform:rotateY(180deg); }
+  .seal{
+    width:44px; height:44px; border:2px solid var(--seal); color:var(--seal);
+    border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:11px; letter-spacing:.05em; transform:rotate(2deg);
+  }
+  .progress-track{ background:var(--line); }
+  .progress-fill{ background:var(--seal); transition:width .3s ease; }
+  .ctrl-btn{
+    border:1px solid var(--line); background:var(--paper);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--paper-deep); border-color:var(--gold); }
+  .ctrl-btn:active{ transform:translateY(1px); }
+  @media (prefers-reduced-motion: reduce){
+    .flip-card{ transition:none; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-10">
+
+  <!-- header -->
+  <div class="w-full max-w-md flex items-baseline justify-between mb-1">
+    <div>
+      <p class="text-xs tracking-wide text-[var(--indigo)]">スターター・いろどり</p>
+      <h1 class="serif text-xl font-bold">第8課 ことばカード</h1>
+    </div>
+    <p id="counter" class="text-sm text-[var(--ink)]/60 serif">1 / 23</p>
+  </div>
+
+  <!-- progress -->
+  <div class="w-full max-w-md h-[3px] progress-track rounded-full mb-8 overflow-hidden">
+    <div id="progressFill" class="h-full progress-fill" style="width:4.3%"></div>
+  </div>
+
+  <!-- card -->
+  <div class="scene w-full max-w-md h-72 sm:h-80 cursor-pointer select-none" id="cardScene">
+    <div class="flip-card" id="flipCard">
+
+      <!-- front -->
+      <div class="face face-front bg-white border border-[var(--line)] shadow-[0_10px_30px_-14px_rgba(42,36,28,0.35)] flex flex-col items-center justify-center px-6">
+        <div class="absolute top-4 right-4 seal">第8課</div>
+        <p id="kanjiText" class="serif font-bold text-6xl sm:text-7xl leading-none">動物園</p>
+        <p class="absolute bottom-5 text-xs text-[var(--ink)]/40 tracking-wide">タップして裏を見る</p>
+      </div>
+
+      <!-- back -->
+      <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col items-center justify-center px-8">
+        <p id="readingText" class="serif text-2xl sm:text-3xl mb-4 tracking-wide">どうぶつえん</p>
+        <div class="w-10 h-[2px] bg-[var(--gold)] mb-4"></div>
+        <p id="meaningText" class="text-xl sm:text-2xl font-medium text-center">zoo</p>
+        <p id="kanjiSmall" class="serif absolute bottom-5 text-sm text-[var(--paper)]/50">動物園</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="w-full max-w-md flex items-center justify-between mt-8 gap-3">
+    <button id="prevBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">← 前</button>
+    <button id="shuffleBtn" class="ctrl-btn px-4 py-3 rounded text-sm">シャッフル</button>
+    <button id="nextBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">次 →</button>
+  </div>
+
+  <p class="text-xs text-[var(--ink)]/40 mt-6">スペースキーで裏返す・矢印キーで移動</p>
+
+<script>
+  const words = [
+    ["動物園","どうぶつえん","zoo"],
+    ["お城","おしろ","castle"],
+    ["レストラン","レストラン","restaurant"],
+    ["博物館","はくぶつかん","museum"],
+    ["アウトレットモール","アウトレットモール","outlet mall"],
+    ["プロレス","プロレス","professional wrestling"],
+    ["タワー","タワー","tower"],
+    ["野球","やきゅう","baseball"],
+    ["もう","もう","already"],
+    ["まだ","まだ","not yet"],
+    ["アジア","アジア","Asia"],
+    ["すごく","すごく","very"],
+    ["市民体育館","しみんたいいくかん","municipal gymnasium"],
+    ["試合","しあい","match"],
+    ["やる","やる","to do"],
+    ["メンバー","メンバー","member"],
+    ["足りない","たりない","not enough"],
+    ["無理","むり","impossible"],
+    ["わかる","わかる","to understand"],
+    ["お金","おかね","money"],
+    ["おろす","おろす","to withdraw"],
+    ["食事","しょくじ","meal / eating"],
+    ["ちょっと","ちょっと","a little"],
+    ["休む","やすむ","to rest"],
+    ["ジョギングシューズ","ジョギングシューズ","jogging shoes"],
+    ["ATM","エーティーエム","ATM (automated teller machine)"],
+    ["ゲームコーナー","ゲームコーナー","game arcade"],
+    ["フードコート","フードコート","food court"],
+    ["カフェ","カフェ","café"],
+    ["映画館","えいがかん","movie theater"],
+    ["スポーツ店","スポーツてん","sports shop"],
+    ["このあと","このあと","after this"],
+    ["お腹がすく","おなかがすく","to get hungry"],
+    ["何か","なにか","something"],
+    ["その前に","そのまえに","before that"],
+    ["すばらしい","すばらしい","wonderful"],
+    ["難しい","むずかしい","difficult"],
+    ["感動する","かんどうする","to be deeply moved"],
+    ["かわいい","かわいい","cute"],
+    ["展覧会","てんらんかい","exhibition"],
+    ["パンダ","パンダ","panda"],
+    ["サル","サル","monkey"],
+    ["現代","げんだい","modern"],
+    ["作品","さくひん","art / a work"],
+    ["ホラー映画","ホラーえいが","horror movie"],
+    ["つまらない","つまらない","boring"],
+    ["退屈","たいくつ","boring"],
+    ["いまいち","いまいち","not so good"]
+  ];
+
+  let order = words.map((_, i) => i);
+  let pos = 0;
+  let flipped = false;
+
+  const flipCard = document.getElementById('flipCard');
+  const cardScene = document.getElementById('cardScene');
+  const kanjiText = document.getElementById('kanjiText');
+  const kanjiSmall = document.getElementById('kanjiSmall');
+  const readingText = document.getElementById('readingText');
+  const meaningText = document.getElementById('meaningText');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+
+  function render(){
+    const [kanji, reading, meaning] = words[order[pos]];
+    kanjiText.textContent = kanji;
+    kanjiSmall.textContent = kanji;
+    readingText.textContent = reading;
+    meaningText.textContent = meaning;
+    counter.textContent = `${pos + 1} / ${words.length}`;
+    progressFill.style.width = `${((pos + 1) / words.length) * 100}%`;
+  }
+
+  function setFlipped(state){
+    flipped = state;
+    flipCard.classList.toggle('flipped', flipped);
+  }
+
+  function go(delta){
+    setFlipped(false);
+    pos = (pos + delta + order.length) % order.length;
+    setTimeout(render, delta === 0 ? 0 : 120);
+  }
+
+  function shuffle(){
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    pos = 0;
+    setFlipped(false);
+    render();
+  }
+
+  cardScene.addEventListener('click', () => setFlipped(!flipped));
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+  document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); setFlipped(!flipped); }
+    if(e.code === 'ArrowRight'){ go(1); }
+    if(e.code === 'ArrowLeft'){ go(-1); }
+  });
+
+  render();
+</script>
+</body>
+</html>
