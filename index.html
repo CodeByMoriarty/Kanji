@@ -6,7 +6,7 @@
 <title>いろどり ことばカード</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#FBF6EC;
@@ -18,7 +18,7 @@
     --line:#DED2B6;
   }
   body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
-  .serif{ font-family:'Shippori Mincho', serif; }
+  .serif{ font-family:'Zen Kaku Gothic New', sans-serif; }
   .paper-texture{
     background-image:
       radial-gradient(circle at 15% 10%, rgba(180,137,63,0.06), transparent 40%),
@@ -60,7 +60,6 @@
 
   <!-- header -->
   <div class="text-center mb-10">
-    <p class="text-xs tracking-widest text-[var(--indigo)] mb-1">JAPANESE FOUNDATION</p>
     <h1 class="serif text-3xl sm:text-4xl font-bold">いろどり ことばカード</h1>
     <p class="text-sm text-[var(--ink)]/60 mt-2">レベルとレッスンを選んでください</p>
   </div>
@@ -68,17 +67,17 @@
   <!-- level selection -->
   <div id="levelSelect" class="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 gap-5">
     <button class="level-card rounded-lg p-6 flex items-center gap-4 text-left" data-level="starter" data-prefix="s">
-      <div class="badge text-[var(--indigo)]">スタ</div>
+      <div class="badge text-[var(--indigo)]">1</div>
       <div>
-        <p class="serif text-lg font-bold">スターター</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">Starter · 第1課〜第18課</p>
+        <p class="serif text-lg font-bold">Irodori 1</p>
+        <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
     <button class="level-card rounded-lg p-6 flex items-center gap-4 text-left" data-level="a2" data-prefix="a">
-      <div class="badge text-[var(--seal)]">A2</div>
+      <div class="badge text-[var(--seal)]">2</div>
       <div>
-        <p class="serif text-lg font-bold">初中級</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">A2 · 第1課〜第18課</p>
+        <p class="serif text-lg font-bold">Irodori 2</p>
+        <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
   </div>
@@ -92,7 +91,8 @@
     <div id="lessonGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-3"></div>
   </div>
 
-  <p class="text-xs text-[var(--ink)]/35 mt-12">©The Japan Foundation ・ いろどり Irodori</p>
+  <p class="text-xs text-[var(--ink)]/35 mt-12">Irodori 1 &amp; 2 フラッシュカード</p>
+  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
 
 <script>
   const levelSelect = document.getElementById('levelSelect');
@@ -102,8 +102,8 @@
   const backBtn = document.getElementById('backBtn');
 
   const levelNames = {
-    starter: 'スターター',
-    a2: '初中級（A2）'
+    starter: 'Irodori 1',
+    a2: 'Irodori 2'
   };
 
   function showLessons(level, prefix){
