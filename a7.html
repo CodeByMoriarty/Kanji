@@ -58,10 +58,15 @@
 </head>
 <body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-10">
 
+  <!-- back to index -->
+  <a href="index.html" class="w-full max-w-md text-xs text-[var(--indigo)] hover:text-[var(--seal)] transition-colors mb-4 inline-flex items-center gap-1">
+    <span aria-hidden="true">←</span> 一覧に戻る
+  </a>
+
   <!-- header -->
   <div class="w-full max-w-md flex items-baseline justify-between mb-1">
     <div>
-      <p class="text-xs tracking-wide text-[var(--indigo)]">初級1・いろどり</p>
+      <p class="text-xs tracking-wide text-[var(--indigo)]">いろどり1</p>
       <h1 class="serif text-xl font-bold">第7課 ことばカード</h1>
     </div>
     <p id="counter" class="text-sm text-[var(--ink)]/60 serif">1 / 34</p>
@@ -86,6 +91,13 @@
       <!-- back -->
       <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col items-center justify-center px-8">
         <p id="readingText" class="serif text-2xl sm:text-3xl mb-4 tracking-wide text-center">えき</p>
+        <button id="speakBtn" class="mb-3 w-10 h-10 rounded-full border border-[var(--paper)]/30 flex items-center justify-center text-[var(--paper)] hover:bg-white/10 active:scale-95 transition" aria-label="発音を聞く" title="発音を聞く">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+            <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/>
+            <path d="M14 4.13v2.06a7 7 0 0 1 0 11.62v2.06a9 9 0 0 0 0-15.74z"/>
+          </svg>
+        </button>
         <div class="w-10 h-[2px] bg-[var(--gold)] mb-4"></div>
         <p id="meaningText" class="text-xl sm:text-2xl font-medium text-center">train station</p>
         <p id="kanjiSmall" class="serif absolute bottom-5 text-sm text-[var(--paper)]/50">駅</p>
@@ -102,6 +114,7 @@
   </div>
 
   <p class="text-xs text-[var(--ink)]/40 mt-6">スペースキーで裏返す・矢印キーで移動</p>
+  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
 
 <script>
   const words = [
@@ -154,6 +167,21 @@
   const counter = document.getElementById('counter');
   const progressFill = document.getElementById('progressFill');
 
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.9;
+    window.speechSynthesis.speak(utter);
+  }
+
+  document.getElementById('speakBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const [, reading] = words[order[pos]];
+    speak(reading);
+  });
+
   function render(){
     const [kanji, reading, meaning] = words[order[pos]];
     kanjiText.textContent = kanji;
@@ -170,12 +198,14 @@
   }
 
   function go(delta){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
     setFlipped(false);
     pos = (pos + delta + order.length) % order.length;
     setTimeout(render, delta === 0 ? 0 : 120);
   }
 
   function shuffle(){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
     for(let i = order.length - 1; i > 0; i--){
       const j = Math.floor(Math.random() * (i + 1));
       [order[i], order[j]] = [order[j], order[i]];
