@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第12課 ことばカード</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-deep:#F3ECDD;
+    --ink:#2A241C;
+    --seal:#A2403B;
+    --indigo:#33506A;
+    --gold:#B4893F;
+    --line:#DED2B6;
+  }
+  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .serif{ font-family:'Zen Kaku Gothic New', sans-serif; }
+  .paper-texture{
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(180,137,63,0.05), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(51,80,106,0.05), transparent 45%);
+  }
+  .scene{ perspective:1600px; }
+  .flip-card{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:6px;
+  }
+  .face-back{ transform:rotateY(180deg); }
+  .seal{
+    width:44px; height:44px; border:2px solid var(--seal); color:var(--seal);
+    border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:11px; letter-spacing:.05em; transform:rotate(2deg);
+  }
+  .progress-track{ background:var(--line); }
+  .progress-fill{ background:var(--seal); transition:width .3s ease; }
+  .ctrl-btn{
+    border:1px solid var(--line); background:var(--paper);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--paper-deep); border-color:var(--gold); }
+  .ctrl-btn:active{ transform:translateY(1px); }
+  @media (prefers-reduced-motion: reduce){
+    .flip-card{ transition:none; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-10">
+
+  <!-- back to index -->
+  <a href="index.html" class="w-full max-w-md text-xs text-[var(--indigo)] hover:text-[var(--seal)] transition-colors mb-4 inline-flex items-center gap-1">
+    <span aria-hidden="true">←</span> 一覧に戻る
+  </a>
+
+  <!-- header -->
+  <div class="w-full max-w-md flex items-baseline justify-between mb-1">
+    <div>
+      <p class="text-xs tracking-wide text-[var(--indigo)]">いろどり1</p>
+      <h1 class="serif text-xl font-bold">第12課 ことばカード</h1>
+    </div>
+    <p id="counter" class="text-sm text-[var(--ink)]/60 serif">1 / 23</p>
+  </div>
+
+  <!-- progress -->
+  <div class="w-full max-w-md h-[3px] progress-track rounded-full mb-8 overflow-hidden">
+    <div id="progressFill" class="h-full progress-fill" style="width:4.3%"></div>
+  </div>
+
+  <!-- card -->
+  <div class="scene w-full max-w-md h-72 sm:h-80 cursor-pointer select-none" id="cardScene">
+    <div class="flip-card" id="flipCard">
+
+      <!-- front -->
+      <div class="face face-front bg-white border border-[var(--line)] shadow-[0_10px_30px_-14px_rgba(42,36,28,0.35)] flex flex-col items-center justify-center px-6">
+        <div class="absolute top-4 right-4 seal">第12課</div>
+        <p id="kanjiText" class="serif font-bold text-6xl sm:text-7xl leading-none">動物園</p>
+        <p class="absolute bottom-5 text-xs text-[var(--ink)]/40 tracking-wide">タップして裏を見る</p>
+      </div>
+
+      <!-- back -->
+      <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col items-center justify-center px-8">
+        <p id="readingText" class="serif text-2xl sm:text-3xl mb-4 tracking-wide">どうぶつえん</p>
+        <button id="speakBtn" class="mb-3 w-10 h-10 rounded-full border border-[var(--paper)]/30 flex items-center justify-center text-[var(--paper)] hover:bg-white/10 active:scale-95 transition" aria-label="発音を聞く" title="発音を聞く">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+            <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/>
+            <path d="M14 4.13v2.06a7 7 0 0 1 0 11.62v2.06a9 9 0 0 0 0-15.74z"/>
+          </svg>
+        </button>
+        <div class="w-10 h-[2px] bg-[var(--gold)] mb-4"></div>
+        <p id="meaningText" class="text-xl sm:text-2xl font-medium text-center">zoo</p>
+        <p id="kanjiSmall" class="serif absolute bottom-5 text-sm text-[var(--paper)]/50">動物園</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="w-full max-w-md flex items-center justify-between mt-8 gap-3">
+    <button id="prevBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">← 前</button>
+    <button id="shuffleBtn" class="ctrl-btn px-4 py-3 rounded text-sm">シャッフル</button>
+    <button id="nextBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">次 →</button>
+  </div>
+
+  <p class="text-xs text-[var(--ink)]/40 mt-6">スペースキーで裏返す・矢印キーで移動</p>
+  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
+
+<script>
+  const words = [
+    ["夏祭り","なつまつり","summer festival"],
+    ["会場","かいじょう","venue"],
+    ["イベント","イベント","event"],
+    ["広場","ひろば","square"],
+    ["食べ物","たべもの","food"],
+    ["飲み物","のみもの","drink"],
+    ["ステージ","ステージ","performance"],
+    ["縁日","えんにち","festival day"],
+    ["文化センター","ぶんかセンター","cultural center"],
+    ["野外","やがい","outdoors"],
+    ["入場料","にゅうじょうりょう","entry fee"],
+    ["～円","～えん","~ yen"],
+    ["場所","ばしょ","place"],
+    ["ホール","ホール","hall"],
+    ["映画上映会","えいがじょうえいかい","film screening"],
+    ["プログラム","プログラム","program"],
+    ["上映作品","じょうえいさくひん","film shown"],
+    ["お問い合わせ","おといあわせ","inquiries"],
+    ["楽しもう！","たのしもう！","Let's enjoy ~ ."],
+    ["交流","こうりゅう","exchange"],
+    ["バーベキュー","バーベキュー","barbecue"],
+    ["日時","にちじ","date and time"],
+    ["駐車場","ちゅうしゃじょう","parking lot"],
+    ["あおぞら","あおぞら","blue skies"],
+    ["問い合わせ先","といあわせさき","contact details (for inquiries)"],
+    ["日本語ボランティア教室","にほんごボランティアきょうしつ","Japanese-language volunteer class"],
+    ["フェスティバル","フェスティバル","festival"],
+    ["入場無料","にゅうじょうむりょう","free entry"],
+    ["1月","いちがつ","January"],
+    ["2月","にがつ","February"],
+    ["3月","さんがつ","March"],
+    ["4月","しがつ","April"],
+    ["5月","ごがつ","May"],
+    ["6月","ろくがつ","June"],
+    ["7月","しちがつ","July"],
+    ["8月","はちがつ","August"],
+    ["9月","くがつ","September"],
+    ["10月","じゅうがつ","October"],
+    ["11月","じゅういちがつ","November"],
+    ["12月","じゅうにがつ","December"],
+    ["何月","なんがつ","which month"],
+    ["1日","ついたち","1st (day of the month)"],
+    ["2日","ふつか","2nd (day of the month)"],
+    ["3日","みっか","3rd (day of the month)"],
+    ["4日","よっか","4th (day of the month)"],
+    ["5日","いつか","5th (day of the month)"],
+    ["6日","むいか","6th (day of the month)"],
+    ["7日","なのか","7th (day of the month)"],
+    ["8日","ようか","8th (day of the month)"],
+    ["9日","ここのか","9th (day of the month)"],
+    ["10日","とおか","10th (day of the month)"],
+    ["11日","じゅういちにち","11th (day of the month)"],
+    ["12日","じゅうににち","12th (day of the month)"],
+    ["13日","じゅうさんにち","13th (day of the month)"],
+    ["14日","じゅうよっか","14th (day of the month)"],
+    ["15日","じゅうごにち","15th (day of the month)"],
+    ["16日","じゅうろくにち","16th (day of the month)"],
+    ["17日","じゅうしちにち","17th (day of the month)"],
+    ["18日","じゅうはちにち","18th (day of the month)"],
+    ["19日","じゅうくにち","19th (day of the month)"],
+    ["20日","はつか","20th (day of the month)"],
+    ["21日","にじゅういちにち","21st (day of the month)"],
+    ["22日","にじゅうににち","22nd (day of the month)"],
+    ["23日","にじゅうさんにち","23rd (day of the month)"],
+    ["24日","にじゅうよっか","24th (day of the month)"],
+    ["25日","にじゅうごにち","25th (day of the month)"],
+    ["26日","にじゅうろくにち","26th (day of the month)"],
+    ["27日","にじゅうしちにち","27th (day of the month)"],
+    ["28日","にじゅうはちにち","28th (day of the month)"],
+    ["29日","にじゅうくにち","29th (day of the month)"],
+    ["30日","さんじゅうにち","30th (day of the month)"],
+    ["31日","さんじゅういちにち","31st (day of the month)"],
+    ["何日","なんにち","which day of the month"],
+    ["今日","きょう","today"],
+    ["明日","あした","tomorrow"],
+    ["あさって","あさって","day after tomorrow"],
+    ["今週","こんしゅう","this week"],
+    ["来週","らいしゅう","next week"],
+    ["パーティー","パーティー","party"],
+    ["空手","からて","karate"],
+    ["試合","しあい","match / game"],
+    ["忘年会","ぼうねんかい","year-end party"],
+    ["もちろん","もちろん","of course"],
+    ["楽しみですね","たのしみですね","I'm looking forward to it."],
+    ["そうですね","そうですね","Me, too. / I agree. (used when the speaker is agreeing with the other person)"],
+    ["まだわかりません","まだわかりません","I don't know yet."],
+    ["残念です","ざんねんです","That's a shame."],
+    ["焼肉","やきにく","yakiniku (Japanese grilled meat)"],
+    ["ハイキング","ハイキング","hiking"],
+    ["飲み会","のみかい","drinking party"],
+    ["いっしょに","いっしょに","together"],
+    ["今度","こんど","next"],
+    ["今晩","こんばん","this evening"],
+    ["また今度","またこんど","Maybe another time."],
+    ["男はつらいよ","おとこはつらいよ","Otoko wa Tsurai yo ("It's Tough Being a Man")"],
+    ["いいね！","いいね！","That's great!"],
+    ["残念","ざんねん","What a pity."],
+    ["了解","りょうかい","Okay."],
+    ["ぐすん","ぐすん","Sniff."]
+  ];
+
+  let order = words.map((_, i) => i);
+  let pos = 0;
+  let flipped = false;
+
+  const flipCard = document.getElementById('flipCard');
+  const cardScene = document.getElementById('cardScene');
+  const kanjiText = document.getElementById('kanjiText');
+  const kanjiSmall = document.getElementById('kanjiSmall');
+  const readingText = document.getElementById('readingText');
+  const meaningText = document.getElementById('meaningText');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.9;
+    window.speechSynthesis.speak(utter);
+  }
+
+  document.getElementById('speakBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const [, reading] = words[order[pos]];
+    speak(reading);
+  });
+
+  function render(){
+    const [kanji, reading, meaning] = words[order[pos]];
+    kanjiText.textContent = kanji;
+    kanjiSmall.textContent = kanji;
+    readingText.textContent = reading;
+    meaningText.textContent = meaning;
+    counter.textContent = `${pos + 1} / ${words.length}`;
+    progressFill.style.width = `${((pos + 1) / words.length) * 100}%`;
+  }
+
+  function setFlipped(state){
+    flipped = state;
+    flipCard.classList.toggle('flipped', flipped);
+  }
+
+  function go(delta){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setFlipped(false);
+    pos = (pos + delta + order.length) % order.length;
+    setTimeout(render, delta === 0 ? 0 : 120);
+  }
+
+  function shuffle(){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    pos = 0;
+    setFlipped(false);
+    render();
+  }
+
+  cardScene.addEventListener('click', () => setFlipped(!flipped));
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+  document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); setFlipped(!flipped); }
+    if(e.code === 'ArrowRight'){ go(1); }
+    if(e.code === 'ArrowLeft'){ go(-1); }
+  });
+
+  render();
+</script>
+</body>
+</html>
