@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第16課 ことばカード</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-deep:#F3ECDD;
+    --ink:#2A241C;
+    --seal:#A2403B;
+    --indigo:#33506A;
+    --gold:#B4893F;
+    --line:#DED2B6;
+  }
+  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .serif{ font-family:'Zen Kaku Gothic New', sans-serif; }
+  .paper-texture{
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(180,137,63,0.05), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(51,80,106,0.05), transparent 45%);
+  }
+  .scene{ perspective:1600px; }
+  .flip-card{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:6px;
+  }
+  .face-back{ transform:rotateY(180deg); }
+  .seal{
+    width:44px; height:44px; border:2px solid var(--seal); color:var(--seal);
+    border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:11px; letter-spacing:.05em; transform:rotate(2deg);
+  }
+  .progress-track{ background:var(--line); }
+  .progress-fill{ background:var(--seal); transition:width .3s ease; }
+  .ctrl-btn{
+    border:1px solid var(--line); background:var(--paper);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--paper-deep); border-color:var(--gold); }
+  .ctrl-btn:active{ transform:translateY(1px); }
+  @media (prefers-reduced-motion: reduce){
+    .flip-card{ transition:none; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-10">
+
+  <!-- back to index -->
+  <a href="index.html" class="w-full max-w-md text-xs text-[var(--indigo)] hover:text-[var(--seal)] transition-colors mb-4 inline-flex items-center gap-1">
+    <span aria-hidden="true">←</span> 一覧に戻る
+  </a>
+
+  <!-- header -->
+  <div class="w-full max-w-md flex items-baseline justify-between mb-1">
+    <div>
+      <p class="text-xs tracking-wide text-[var(--indigo)]">いろどり1</p>
+      <h1 class="serif text-xl font-bold">第16課 ことばカード</h1>
+    </div>
+    <p id="counter" class="text-sm text-[var(--ink)]/60 serif">1 / 23</p>
+  </div>
+
+  <!-- progress -->
+  <div class="w-full max-w-md h-[3px] progress-track rounded-full mb-8 overflow-hidden">
+    <div id="progressFill" class="h-full progress-fill" style="width:4.3%"></div>
+  </div>
+
+  <!-- card -->
+  <div class="scene w-full max-w-md h-72 sm:h-80 cursor-pointer select-none" id="cardScene">
+    <div class="flip-card" id="flipCard">
+
+      <!-- front -->
+      <div class="face face-front bg-white border border-[var(--line)] shadow-[0_10px_30px_-14px_rgba(42,36,28,0.35)] flex flex-col items-center justify-center px-6">
+        <div class="absolute top-4 right-4 seal">第16課</div>
+        <p id="kanjiText" class="serif font-bold text-6xl sm:text-7xl leading-none">動物園</p>
+        <p class="absolute bottom-5 text-xs text-[var(--ink)]/40 tracking-wide">タップして裏を見る</p>
+      </div>
+
+      <!-- back -->
+      <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col items-center justify-center px-8">
+        <p id="readingText" class="serif text-2xl sm:text-3xl mb-4 tracking-wide">どうぶつえん</p>
+        <button id="speakBtn" class="mb-3 w-10 h-10 rounded-full border border-[var(--paper)]/30 flex items-center justify-center text-[var(--paper)] hover:bg-white/10 active:scale-95 transition" aria-label="発音を聞く" title="発音を聞く">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+            <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/>
+            <path d="M14 4.13v2.06a7 7 0 0 1 0 11.62v2.06a9 9 0 0 0 0-15.74z"/>
+          </svg>
+        </button>
+        <div class="w-10 h-[2px] bg-[var(--gold)] mb-4"></div>
+        <p id="meaningText" class="text-xl sm:text-2xl font-medium text-center">zoo</p>
+        <p id="kanjiSmall" class="serif absolute bottom-5 text-sm text-[var(--paper)]/50">動物園</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="w-full max-w-md flex items-center justify-between mt-8 gap-3">
+    <button id="prevBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">← 前</button>
+    <button id="shuffleBtn" class="ctrl-btn px-4 py-3 rounded text-sm">シャッフル</button>
+    <button id="nextBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">次 →</button>
+  </div>
+
+  <p class="text-xs text-[var(--ink)]/40 mt-6">スペースキーで裏返す・矢印キーで移動</p>
+  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
+
+<script>
+  const words = [
+    ["1円","いちえん","1 yen"],
+    ["5円","ごえん","5 yen"],
+    ["10円","じゅうえん","10 yen"],
+    ["50円","ごじゅうえん","50 yen"],
+    ["100","ひゃく","one hundred"],
+    ["200","にひゃく","two hundred"],
+    ["300","さんびゃく","three hundred"],
+    ["400","よんひゃく","four hundred"],
+    ["500","ごひゃく","five hundred"],
+    ["600","ろっぴゃく","six hundred"],
+    ["700","ななひゃく","seven hundred"],
+    ["800","はっぴゃく","eight hundred"],
+    ["900","きゅうひゃく","nine hundred"],
+    ["1,000","せん","one thousand"],
+    ["2,000","にせん","two thousand"],
+    ["3,000","さんぜん","three thousand"],
+    ["4,000","よんせん","four thousand"],
+    ["5,000","ごせん","five thousand"],
+    ["6,000","ろくせん","six thousand"],
+    ["7,000","ななせん","seven thousand"],
+    ["8,000","はっせん","eight thousand"],
+    ["9,000","きゅうせん","nine thousand"],
+    ["10,000","いちまん","ten thousand"],
+    ["100円","ひゃくえん","100 yen"],
+    ["200円","にひゃくえん","200 yen"],
+    ["300円","さんびゃくえん","300 yen"],
+    ["400円","よんひゃくえん","400 yen"],
+    ["500円","ごひゃくえん","500 yen"],
+    ["600円","ろっぴゃくえん","600 yen"],
+    ["700円","ななひゃくえん","700 yen"],
+    ["800円","はっぴゃくえん","800 yen"],
+    ["900円","きゅうひゃくえん","900 yen"],
+    ["1,000円","せんえん","1,000 yen"],
+    ["2,000円","にせんえん","2,000 yen"],
+    ["3,000円","さんぜんえん","3,000 yen"],
+    ["4,000円","よんせんえん","4,000 yen"],
+    ["5,000円","ごせんえん","5,000 yen"],
+    ["6,000円","ろくせんえん","6,000 yen"],
+    ["7,000円","ななせんえん","7,000 yen"],
+    ["8,000円","はっせんえん","8,000 yen"],
+    ["9,000円","きゅうせんえん","9,000 yen"],
+    ["10,000円","いちまんえん","10,000 yen"],
+    ["いくら","いくら","how much (asking price)"],
+    ["カレンダー","カレンダー","calendar"],
+    ["お菓子","おかし","sweets"],
+    ["招き猫","まねきねこ","maneki-neko (lucky cat figurine)"],
+    ["Tシャツ","ティーシャツ","T-shirt"],
+    ["その","その","that ~ (close to the listener)"],
+    ["それ","それ","that (close to the listener)"],
+    ["この","この","this ~ (close to the speaker)"],
+    ["これ","これ","this (close to the speaker)"],
+    ["あの","あの","that ~ (away from both speaker and listener)"],
+    ["あれ","あれ","that (away from both speaker and listener)"],
+    ["いいです","いいです","No, thank you. (used to refuse something)"],
+    ["たい焼き","たいやき","taiyaki (confectionary shaped like a grilled sea bream)"],
+    ["コロッケ","コロッケ","korokke (deep-fried side dish similar to croquettes)"],
+    ["シュウマイ","シュウマイ","shumai (Chinese meat dumpling)"],
+    ["ひき肉","ひきにく","minced meat"],
+    ["チョコレートケーキ","チョコレートケーキ","chocolate cake"],
+    ["チーズケーキ","チーズケーキ","cheesecake"],
+    ["昆布","こんぶ","kombu (kelp)"],
+    ["たらこ","たらこ","tarako (cod roe)"],
+    ["梅","うめ","ume (pickled plum)"],
+    ["～個","～こ","~ items"],
+    ["～g","～グラム","~g"],
+    ["～ずつ","～ずつ","~ each"],
+    ["かしこまりました","かしこまりました","Certainly. (polite expression)"],
+    ["1個","いっこ","1 item"],
+    ["2個","にこ","2 items"],
+    ["3個","さんこ","3 items"],
+    ["4個","よんこ","4 items"],
+    ["5個","ごこ","5 items"],
+    ["6個","ろっこ","6 items"],
+    ["7個","ななこ","7 items"],
+    ["8個","はちこ／はっこ","8 items"],
+    ["9個","きゅうこ","9 items"],
+    ["10個","じゅっこ","10 items"],
+    ["何個","なんこ","how many (items)"],
+    ["温める／温めます","あたためる／あたためます","to warm up"],
+    ["袋","ふくろ","bag"],
+    ["Suica","スイカ","Suica (a pre-paid card used to pay transportation fees and for shopping)"],
+    ["タッチする／タッチします","タッチする／タッチします","to tap / touch"],
+    ["～は、どうしますか？","～は、どうしますか？","And what about ~ ?"],
+    ["だいじょうぶです","だいじょうぶです","That's all right. (used when refusing something)"],
+    ["～でお願いします","～でおねがいします","With ~ , please."],
+    ["タッチしてください","タッチしてください","Tap your card here please."],
+    ["ありがとうございました","ありがとうございました","Thank you very much. (used to say thank you at the end)"],
+    ["こちら","こちら","this (polite expression)"],
+    ["お次の方","おつぎのかた","Next, please. (polite expression)"],
+    ["おつけしますか？","おつけしますか？","Shall I add ~ ? (polite expression)"],
+    ["お会計、～になります","おかいけい、～になります","The total amount is ~ . (polite expression)"],
+    ["おはし","おはし","chopsticks"],
+    ["フォーク","フォーク","fork"],
+    ["ストロー","ストロー","straw"],
+    ["クレジットカード","クレジットカード","credit card"],
+    ["Edy","エディー","Edy (electronic payment card)"],
+    ["PayPay","ペイペイ","PayPay (QR-code-based electronic payment method)"],
+    ["～割引","～わりびき","~ x 10% off (e.g. 20% off)"],
+    ["表示価格より","ひょうじかかくより","from the list price"],
+    ["若鶏","わかどり","spring chicken"],
+    ["税込","ぜいこみ","including tax"],
+    ["～％引","～パーセントびき","~ % off (e.g. 10% off)"],
+    ["全品","ぜんぴん","all items"],
+    ["一人暮らし","ひとりぐらし","living alone"],
+    ["応援","おうえん","support"],
+    ["セール","セール","sale"],
+    ["小型","こがた","compact"],
+    ["さらに","さらに","further"],
+    ["ポイントサービス","ポイントサービス","reward points"],
+    ["～円引","～えんびき","~ yen off (e.g. 50 yen off)"],
+    ["苺ショートケーキ","いちごショートケーキ","strawberry shortcake"],
+    ["本日","ほんじつ","today"],
+    ["値下価格","ねさげかかく","discounted price"],
+    ["税抜","ぜいぬき","excluding tax"],
+    ["半額","はんがく","half price"],
+    ["レジにて","レジにて","at the cash register"],
+    ["国産銘柄鶏胸肉","こくさんめいがらとりむねにく","famous home-grown chicken breast"],
+    ["～円均一","～えんきんいつ","everything at ~ yen (e.g. everything at 50 yen)"],
+    ["ワゴン","ワゴン","cart"],
+    ["商品","しょうひん","product"]
+  ];
+
+  let order = words.map((_, i) => i);
+  let pos = 0;
+  let flipped = false;
+
+  const flipCard = document.getElementById('flipCard');
+  const cardScene = document.getElementById('cardScene');
+  const kanjiText = document.getElementById('kanjiText');
+  const kanjiSmall = document.getElementById('kanjiSmall');
+  const readingText = document.getElementById('readingText');
+  const meaningText = document.getElementById('meaningText');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.9;
+    window.speechSynthesis.speak(utter);
+  }
+
+  document.getElementById('speakBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const [, reading] = words[order[pos]];
+    speak(reading);
+  });
+
+  function render(){
+    const [kanji, reading, meaning] = words[order[pos]];
+    kanjiText.textContent = kanji;
+    kanjiSmall.textContent = kanji;
+    readingText.textContent = reading;
+    meaningText.textContent = meaning;
+    counter.textContent = `${pos + 1} / ${words.length}`;
+    progressFill.style.width = `${((pos + 1) / words.length) * 100}%`;
+  }
+
+  function setFlipped(state){
+    flipped = state;
+    flipCard.classList.toggle('flipped', flipped);
+  }
+
+  function go(delta){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setFlipped(false);
+    pos = (pos + delta + order.length) % order.length;
+    setTimeout(render, delta === 0 ? 0 : 120);
+  }
+
+  function shuffle(){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    pos = 0;
+    setFlipped(false);
+    render();
+  }
+
+  cardScene.addEventListener('click', () => setFlipped(!flipped));
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+  document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); setFlipped(!flipped); }
+    if(e.code === 'ArrowRight'){ go(1); }
+    if(e.code === 'ArrowLeft'){ go(-1); }
+  });
+
+  render();
+</script>
+</body>
+</html>
