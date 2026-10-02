@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第14課 ことばカード</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-deep:#F3ECDD;
+    --ink:#2A241C;
+    --seal:#A2403B;
+    --indigo:#33506A;
+    --gold:#B4893F;
+    --line:#DED2B6;
+  }
+  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .serif{ font-family:'Zen Kaku Gothic New', sans-serif; }
+  .paper-texture{
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(180,137,63,0.05), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(51,80,106,0.05), transparent 45%);
+  }
+  .scene{ perspective:1600px; }
+  .flip-card{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:6px;
+  }
+  .face-back{ transform:rotateY(180deg); }
+  .seal{
+    width:44px; height:44px; border:2px solid var(--seal); color:var(--seal);
+    border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:11px; letter-spacing:.05em; transform:rotate(2deg);
+  }
+  .progress-track{ background:var(--line); }
+  .progress-fill{ background:var(--seal); transition:width .3s ease; }
+  .ctrl-btn{
+    border:1px solid var(--line); background:var(--paper);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--paper-deep); border-color:var(--gold); }
+  .ctrl-btn:active{ transform:translateY(1px); }
+  @media (prefers-reduced-motion: reduce){
+    .flip-card{ transition:none; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-10">
+
+  <!-- back to index -->
+  <a href="index.html" class="w-full max-w-md text-xs text-[var(--indigo)] hover:text-[var(--seal)] transition-colors mb-4 inline-flex items-center gap-1">
+    <span aria-hidden="true">←</span> 一覧に戻る
+  </a>
+
+  <!-- header -->
+  <div class="w-full max-w-md flex items-baseline justify-between mb-1">
+    <div>
+      <p class="text-xs tracking-wide text-[var(--indigo)]">いろどり1</p>
+      <h1 class="serif text-xl font-bold">第14課 ことばカード</h1>
+    </div>
+    <p id="counter" class="text-sm text-[var(--ink)]/60 serif">1 / 23</p>
+  </div>
+
+  <!-- progress -->
+  <div class="w-full max-w-md h-[3px] progress-track rounded-full mb-8 overflow-hidden">
+    <div id="progressFill" class="h-full progress-fill" style="width:4.3%"></div>
+  </div>
+
+  <!-- card -->
+  <div class="scene w-full max-w-md h-72 sm:h-80 cursor-pointer select-none" id="cardScene">
+    <div class="flip-card" id="flipCard">
+
+      <!-- front -->
+      <div class="face face-front bg-white border border-[var(--line)] shadow-[0_10px_30px_-14px_rgba(42,36,28,0.35)] flex flex-col items-center justify-center px-6">
+        <div class="absolute top-4 right-4 seal">第14課</div>
+        <p id="kanjiText" class="serif font-bold text-6xl sm:text-7xl leading-none">動物園</p>
+        <p class="absolute bottom-5 text-xs text-[var(--ink)]/40 tracking-wide">タップして裏を見る</p>
+      </div>
+
+      <!-- back -->
+      <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col items-center justify-center px-8">
+        <p id="readingText" class="serif text-2xl sm:text-3xl mb-4 tracking-wide">どうぶつえん</p>
+        <button id="speakBtn" class="mb-3 w-10 h-10 rounded-full border border-[var(--paper)]/30 flex items-center justify-center text-[var(--paper)] hover:bg-white/10 active:scale-95 transition" aria-label="発音を聞く" title="発音を聞く">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+            <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/>
+            <path d="M14 4.13v2.06a7 7 0 0 1 0 11.62v2.06a9 9 0 0 0 0-15.74z"/>
+          </svg>
+        </button>
+        <div class="w-10 h-[2px] bg-[var(--gold)] mb-4"></div>
+        <p id="meaningText" class="text-xl sm:text-2xl font-medium text-center">zoo</p>
+        <p id="kanjiSmall" class="serif absolute bottom-5 text-sm text-[var(--paper)]/50">動物園</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="w-full max-w-md flex items-center justify-between mt-8 gap-3">
+    <button id="prevBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">← 前</button>
+    <button id="shuffleBtn" class="ctrl-btn px-4 py-3 rounded text-sm">シャッフル</button>
+    <button id="nextBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">次 →</button>
+  </div>
+
+  <p class="text-xs text-[var(--ink)]/40 mt-6">スペースキーで裏返す・矢印キーで移動</p>
+  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
+
+<script>
+  const words = [
+    ["サービス","サービス","service"],
+    ["郵便局","ゆうびんきょく","post office"],
+    ["不動産屋","ふどうさんや","real estate agent"],
+    ["理髪店","りはつてん","barbershop"],
+    ["床屋","とこや","barbershop"],
+    ["美容院","びよういん","beauty salon"],
+    ["クリーニング店","クリーニングてん","dry cleaner"],
+    ["コインランドリー","コインランドリー","laundromat"],
+    ["中古車店","ちゅうこしゃてん","used car shop"],
+    ["自転車店","じてんしゃてん","bicycle shop"],
+    ["携帯ショップ","けいたいショップ","mobile phone shop"],
+    ["スマホ修理店","スマホしゅうりてん","smartphone repair shop"],
+    ["リサイクルショップ","リサイクルショップ","recycle shop"],
+    ["クリーニング","クリーニング","dry cleaning"],
+    ["シミ","シミ","stain"],
+    ["落ちる","おちる","to be removed (e.g. dirt is removed)"],
+    ["シミ抜き","シミぬき","stain removal"],
+    ["別料金","べつりょうきん","extra charge"],
+    ["お渡し","おわたし","handover (polite expression)"],
+    ["空気","くうき","air"],
+    ["空気入れ","くうきいれ","pump"],
+    ["入る","はいる","to go into (e.g. air goes into / inflates)"],
+    ["タイヤ","タイヤ","tire"],
+    ["キャップ","キャップ","cap"],
+    ["はずす","はずす","to remove"],
+    ["はさむ","はさむ","to clamp"],
+    ["かぶせる","かぶせる","to cover"],
+    ["ついでに","ついでに","in addition"],
+    ["油を差す","あぶらをさす","to oil"],
+    ["どれどれ","どれどれ","Let me see."],
+    ["宅配便","たくはいびん","parcel delivery service"],
+    ["着払い","ちゃくばらい","cash on delivery"],
+    ["元払い","もとばらい","prepayment"],
+    ["受け取る","うけとる","to receive"],
+    ["伝票","でんぴょう","slip"],
+    ["指定","してい","specify"],
+    ["午前中","ごぜんちゅう","in the morning"],
+    ["最も","もっとも","most"],
+    ["お届け","おとどけ","delivery (polite expression)"],
+    ["お預かりします","おあずかりします","We accept your package. (polite expression)"],
+    ["表示する","ひょうじする","to display"],
+    ["キャッシュカード","キャッシュカード","cash card"],
+    ["お引き出し","おひきだし","withdraw (polite expression)"],
+    ["次に","つぎに","next"],
+    ["暗証番号","あんしょうばんごう","personal identification number (PIN)"],
+    ["入力する","にゅうりょくする","to enter"],
+    ["~桁","~けた","~ digit(s) (e.g. four digits)"],
+    ["緑色","みどりいろ","green"],
+    ["金額","きんがく","amount"],
+    ["~円札","~えんさつ","~ yen bill (e.g. 10,000 yen bill)"],
+    ["一部","いちぶ","part of"],
+    ["両替","りょうがえ","(to) change money"],
+    ["利用明細/ご利用明細","りようめいさい","usage statement"],
+    ["紙幣","しへい","banknote"],
+    ["お取りください","おとりください","Please take ~ . (polite expression)"],
+    ["ご利用ありがとうございました","ごりようありがとうございました","Thank you for using our services. (polite expression)"],
+    ["ポストに入れる","ポストにいれる","to post / to mail"],
+    ["申し込む","もうしこむ","to request"],
+    ["郵便物","ゆうびんぶつ","delivery"],
+    ["不在/ご不在","ふざい","absence"],
+    ["窓口","まどぐち","window / counter"],
+    ["再配達","さいはいたつ","redelivery"],
+    ["自動","じどう","automatic (e.g. 24-hour automatic reception)"],
+    ["連絡票","れんらくひょう","notice"],
+    ["受取り/お受け取り","うけとり","receipt"],
+    ["印鑑","いんかん","inkan (seal)"],
+    ["免許証","めんきょしょう","(driver's) license"],
+    ["保険証","ほけんしょう","health insurance card"],
+    ["マイナンバーカード","マイナンバーカード","Individual Number Card"],
+    ["当日","とうじつ","same day / today (e.g. mail to be delivered today)"],
+    ["固定電話","こていでんわ","landline phone"],
+    ["郵便番号","ゆうびんばんごう","zip code"],
+    ["種類番号","しゅるいばんごう","mail type number"],
+    ["国際","こくさい","international"],
+    ["書留","かきとめ","registered mail"],
+    ["小包","こづつみ","small parcel"],
+    ["お知らせ番号","おしらせばんごう","notice number"],
+    ["配達日","はいたつび","delivery date"],
+    ["保管期限","ほかんきげん","storage deadline"],
+    ["勤め先/お勤め先","つとめさき","where you work"],
+    ["近所","きんじょ","neighbor"],
+    ["配達希望日","はいたつきぼうび","requested delivery date"],
+    ["配達先","はいたつさき","delivery destination"],
+    ["どのように","どのように","how"],
+    ["全体的に","ぜんたいてきに","all over"],
+    ["~mm","~ミリ","~ mm (millimeter(s))"],
+    ["まわり","まわり","around"],
+    ["バリカン","バリカン","clippers"],
+    ["ひげ剃り","ひげそり","shave"],
+    ["鏡","かがみ","mirror"],
+    ["後ろのほう","うしろのほう","the back"],
+    ["こんな感じ","こんなかんじ","like this"],
+    ["洗面台","せんめんだい","sink"],
+    ["洗う","あらう","to wash"],
+    ["カット","カット","haircut"],
+    ["預かる","あずかる","to receive"],
+    ["お返し","おかえし","change (polite expression)"],
+    ["なさいますか？","なさいますか？","Would you like ~ ? (polite expression)"],
+    ["~円からお預かりします","~えんからおあずかりします","Out of ~ yen. (polite expression)"],
+    ["どのような","どのような","how"],
+    ["長さ","ながさ","length"],
+    ["シャンプー台","シャンプーだい","shampoo station"],
+    ["前髪","まえがみ","bangs"],
+    ["お待ちしておりました","おまちしておりました","We have been waiting for you. (polite expression)"],
+    ["かゆいところはございませんか？","かゆいところはございませんか？","Does it itch anywhere? (polite expression)"],
+    ["どうでしょうか？","どうでしょうか？","What do you think? (polite expression)"],
+    ["カラー","カラー","coloring"],
+    ["パーマ","パーマ","perm"],
+    ["トリートメント","トリートメント","treatment"],
+    ["外国人","がいこくじん","foreign resident"],
+    ["~による","~による","by ~ / using ~ (e.g. consultation using a foreign language)"],
+    ["相談","そうだん","consultation"],
+    ["翻訳","ほんやく","translation"],
+    ["通訳","つうやく","interpretation"],
+    ["健康診断","けんこうしんだん","health checkup"],
+    ["生活ガイドブック","せいかつガイドブック","living guidebook"],
+    ["日本語教室","にほんごきょうしつ","Japanese language class"],
+    ["交流イベント","こうりゅうイベント","social event"],
+    ["質問","しつもん","question"],
+    ["ビザ","ビザ","visa"],
+    ["ほかにも","ほかにも","there are also / in addition"],
+    ["情報","じょうほう","information"],
+    ["けが","けが","injury"],
+    ["有料","ゆうりょう","fee-based"],
+    ["助かる","たすかる","to be helpful"],
+    ["楽に","らくに","easily"],
+    ["暮らす","くらす","to live a life"],
+    ["センター","センター","center"],
+    ["入門","にゅうもん","introductory"],
+    ["上級","じょうきゅう","advanced"],
+    ["個人レッスン","こじんレッスン","private lesson"]
+  ];
+
+  let order = words.map((_, i) => i);
+  let pos = 0;
+  let flipped = false;
+
+  const flipCard = document.getElementById('flipCard');
+  const cardScene = document.getElementById('cardScene');
+  const kanjiText = document.getElementById('kanjiText');
+  const kanjiSmall = document.getElementById('kanjiSmall');
+  const readingText = document.getElementById('readingText');
+  const meaningText = document.getElementById('meaningText');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.9;
+    window.speechSynthesis.speak(utter);
+  }
+
+  document.getElementById('speakBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const [, reading] = words[order[pos]];
+    speak(reading);
+  });
+
+  function render(){
+    const [kanji, reading, meaning] = words[order[pos]];
+    kanjiText.textContent = kanji;
+    kanjiSmall.textContent = kanji;
+    readingText.textContent = reading;
+    meaningText.textContent = meaning;
+    counter.textContent = `${pos + 1} / ${words.length}`;
+    progressFill.style.width = `${((pos + 1) / words.length) * 100}%`;
+  }
+
+  function setFlipped(state){
+    flipped = state;
+    flipCard.classList.toggle('flipped', flipped);
+  }
+
+  function go(delta){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setFlipped(false);
+    pos = (pos + delta + order.length) % order.length;
+    setTimeout(render, delta === 0 ? 0 : 120);
+  }
+
+  function shuffle(){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    pos = 0;
+    setFlipped(false);
+    render();
+  }
+
+  cardScene.addEventListener('click', () => setFlipped(!flipped));
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+  document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); setFlipped(!flipped); }
+    if(e.code === 'ArrowRight'){ go(1); }
+    if(e.code === 'ArrowLeft'){ go(-1); }
+  });
+
+  render();
+</script>
+</body>
+</html>

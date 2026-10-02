@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第12課 ことばカード</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-deep:#F3ECDD;
+    --ink:#2A241C;
+    --seal:#A2403B;
+    --indigo:#33506A;
+    --gold:#B4893F;
+    --line:#DED2B6;
+  }
+  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .serif{ font-family:'Zen Kaku Gothic New', sans-serif; }
+  .paper-texture{
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(180,137,63,0.05), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(51,80,106,0.05), transparent 45%);
+  }
+  .scene{ perspective:1600px; }
+  .flip-card{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:6px;
+  }
+  .face-back{ transform:rotateY(180deg); }
+  .seal{
+    width:44px; height:44px; border:2px solid var(--seal); color:var(--seal);
+    border-radius:3px; display:flex; align-items:center; justify-content:center;
+    font-size:11px; letter-spacing:.05em; transform:rotate(2deg);
+  }
+  .progress-track{ background:var(--line); }
+  .progress-fill{ background:var(--seal); transition:width .3s ease; }
+  .ctrl-btn{
+    border:1px solid var(--line); background:var(--paper);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--paper-deep); border-color:var(--gold); }
+  .ctrl-btn:active{ transform:translateY(1px); }
+  @media (prefers-reduced-motion: reduce){
+    .flip-card{ transition:none; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-10">
+
+  <!-- back to index -->
+  <a href="index.html" class="w-full max-w-md text-xs text-[var(--indigo)] hover:text-[var(--seal)] transition-colors mb-4 inline-flex items-center gap-1">
+    <span aria-hidden="true">←</span> 一覧に戻る
+  </a>
+
+  <!-- header -->
+  <div class="w-full max-w-md flex items-baseline justify-between mb-1">
+    <div>
+      <p class="text-xs tracking-wide text-[var(--indigo)]">いろどり1</p>
+      <h1 class="serif text-xl font-bold">第12課 ことばカード</h1>
+    </div>
+    <p id="counter" class="text-sm text-[var(--ink)]/60 serif">1 / 23</p>
+  </div>
+
+  <!-- progress -->
+  <div class="w-full max-w-md h-[3px] progress-track rounded-full mb-8 overflow-hidden">
+    <div id="progressFill" class="h-full progress-fill" style="width:4.3%"></div>
+  </div>
+
+  <!-- card -->
+  <div class="scene w-full max-w-md h-72 sm:h-80 cursor-pointer select-none" id="cardScene">
+    <div class="flip-card" id="flipCard">
+
+      <!-- front -->
+      <div class="face face-front bg-white border border-[var(--line)] shadow-[0_10px_30px_-14px_rgba(42,36,28,0.35)] flex flex-col items-center justify-center px-6">
+        <div class="absolute top-4 right-4 seal">第12課</div>
+        <p id="kanjiText" class="serif font-bold text-6xl sm:text-7xl leading-none">動物園</p>
+        <p class="absolute bottom-5 text-xs text-[var(--ink)]/40 tracking-wide">タップして裏を見る</p>
+      </div>
+
+      <!-- back -->
+      <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col items-center justify-center px-8">
+        <p id="readingText" class="serif text-2xl sm:text-3xl mb-4 tracking-wide">どうぶつえん</p>
+        <button id="speakBtn" class="mb-3 w-10 h-10 rounded-full border border-[var(--paper)]/30 flex items-center justify-center text-[var(--paper)] hover:bg-white/10 active:scale-95 transition" aria-label="発音を聞く" title="発音を聞く">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+            <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+            <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/>
+            <path d="M14 4.13v2.06a7 7 0 0 1 0 11.62v2.06a9 9 0 0 0 0-15.74z"/>
+          </svg>
+        </button>
+        <div class="w-10 h-[2px] bg-[var(--gold)] mb-4"></div>
+        <p id="meaningText" class="text-xl sm:text-2xl font-medium text-center">zoo</p>
+        <p id="kanjiSmall" class="serif absolute bottom-5 text-sm text-[var(--paper)]/50">動物園</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="w-full max-w-md flex items-center justify-between mt-8 gap-3">
+    <button id="prevBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">← 前</button>
+    <button id="shuffleBtn" class="ctrl-btn px-4 py-3 rounded text-sm">シャッフル</button>
+    <button id="nextBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">次 →</button>
+  </div>
+
+  <p class="text-xs text-[var(--ink)]/40 mt-6">スペースキーで裏返す・矢印キーで移動</p>
+  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
+
+<script>
+  const words = [
+    ["電気製品","でんきせいひん","electric appliance"],
+    ["冷蔵庫","れいぞうこ","refrigerator"],
+    ["洗濯機","せんたくき","washing machine"],
+    ["電子レンジ","でんしレンジ","microwave"],
+    ["掃除機","そうじき","vacuum cleaner"],
+    ["ポット","ポット","hot water dispenser"],
+    ["パソコン","パソコン","personal computer"],
+    ["タブレット","タブレット","tablet"],
+    ["イヤホン","イヤホン","earphones"],
+    ["扇風機","せんぷうき","electric fan"],
+    ["ストーブ","ストーブ","heating stove"],
+    ["ヒーター","ヒーター","heater"],
+    ["ドライヤー","ドライヤー","hair-dryer"],
+    ["アイロン","アイロン","iron"],
+    ["モデル","モデル","model"],
+    ["音","おと","sound"],
+    ["デザイン","デザイン","design"],
+    ["商品","しょうひん","product"],
+    ["送料","そうりょう","shipping cost"],
+    ["無料","むりょう","free of charge"],
+    ["お店の人","おみせのひと","store staff"],
+    ["相談","そうだん","(to) consult"],
+    ["届く","とどく","to be delivered"],
+    ["店員","てんいん","store staff"],
+    ["便利","べんり","convenient"],
+    ["すぐ","すぐ","immediately"],
+    ["見つかる","みつかる","to find"],
+    ["高く","たかく","high price"],
+    ["売れる","うれる","to be able to sell"],
+    ["手続き","てつづき","procedure"],
+    ["簡単","かんたん","easy / simple"],
+    ["メーカー","メーカー","manufacturer"],
+    ["ワイヤレス","ワイヤレス","wireless"],
+    ["手元","てもと","me (literally in one's possession / on hand)"],
+    ["電気屋","でんきや","electric appliance store"],
+    ["国道沿い","こくどうぞい","along the National Route"],
+    ["開店","かいてん","opening (e.g. opening sale)"],
+    ["車を出す","くるまをだす","to give a ride"],
+    ["フリマサイト","フリマサイト","flea market website"],
+    ["家電","かでん","household appliances"],
+    ["カテゴリー","カテゴリー","category"],
+    ["ブランド","ブランド","brand"],
+    ["ホーム","ホーム","homepage"],
+    ["出品","しゅっぴん","submit"],
+    ["マイページ","マイページ","my page (user's personal page)"],
+    ["住まい","すまい","for the home"],
+    ["絞り込み","しぼりこみ","narrow down"],
+    ["販売中","はんばいちゅう","on sale"],
+    ["表示","ひょうじ","display"],
+    ["~順","~じゅん","in order of ~ (e.g. from lowest to highest price)"],
+    ["価格","かかく","price"],
+    ["状態","じょうたい","condition"],
+    ["配送料","はいそうりょう","delivery charges"],
+    ["販売状況","はんばいじょうきょう","sale status"],
+    ["指定する","していする","to specify"],
+    ["取り消し","とりけし","cancel"],
+    ["完了","かんりょう","confirm"],
+    ["購入","こうにゅう","(to) buy"],
+    ["傷","きず","scratch"],
+    ["汚れ","よごれ","dirt"],
+    ["~込み","~こみ","including ~ (e.g. including postage)"],
+    ["~合","~ごう","~ cups (Japanese unit of volume for rice) (e.g. 5.5 cups)"],
+    ["出品する","しゅっぴんする","to put up for sale"],
+    ["問題なく","もんだいなく","without problems"],
+    ["炊ける","たける","to be cooked (e.g. rice cooks)"],
+    ["詳細","しょうさい","details"],
+    ["~製","~せい","made in ~ (e.g. made in 2018)"],
+    ["幅","はば","width"],
+    ["奥行","おくゆき","depth"],
+    ["高さ","たかさ","height"],
+    ["重さ","おもさ","weight"],
+    ["説明書","せつめいしょ","instruction booklet"],
+    ["~つき","~つき","with ~ (e.g. with an instruction booklet)"],
+    ["購入手続き","こうにゅうてつづき","purchase procedure"],
+    ["連続","れんぞく","continuous"],
+    ["充電","じゅうでん","charge"],
+    ["しっかり","しっかり","thoroughly"],
+    ["使用時間","しようじかん","usable time"],
+    ["こんな","こんな","this / these (e.g. these people)"],
+    ["モード","モード","mode (e.g. strong mode)"],
+    ["多機能","たきのう","multifunctional"],
+    ["長持ち","ながもち","long-lasting"],
+    ["超軽量","ちょうけいりょう","ultralight"],
+    ["お手入れ","おていれ","maintenance"],
+    ["吸引","きゅういん","suction (to suck up)"],
+    ["吸引力","きゅういんりょく","suction power"],
+    ["コンパクト","コンパクト","compact"],
+    ["持ち運ぶ","もちはこぶ","to carry"],
+    ["重視する","じゅうしする","to prioritize"],
+    ["すみずみ","すみずみ","all the way into the corners"],
+    ["税別","ぜいべつ","price before tax"],
+    ["広告の品","こうこくのしな","advertised item"],
+    ["特別価格","とくべつかかく","special price"],
+    ["コードレス","コードレス","cordless"],
+    ["希望小売価格","きぼうこうりかかく","suggested retail price"],
+    ["軽い","かるい","lightweight"],
+    ["動かす","うごかす","to move around"],
+    ["持つ","もつ","to carry"],
+    ["比べる","くらべる","to compare"],
+    ["パワフル","パワフル","powerful"],
+    ["機能","きのう","function"],
+    ["つく","つく","to include / to attach (e.g. included functions)"],
+    ["カーペット","カーペット","carpet"],
+    ["畳","たたみ","tatami"],
+    ["エコモード","エコモード","eco mode"],
+    ["ですから","ですから","and so / therefore"],
+    ["~に合わせて","~にあわせて","in a way that suits ~ (e.g. in a way that suits the room)"],
+    ["複雑","ふくざつ","complicated"],
+    ["重い","おもい","heavy"],
+    ["予算オーバー","よさんオーバー","over budget"],
+    ["シンプル","シンプル","simple"],
+    ["消費税","しょうひぜい","consumption tax"],
+    ["~抜き","~ぬき","without ~ (e.g. without consumption tax)"],
+    ["~引き","~びき","~ discount (e.g. 2,000 yen discount)"],
+    ["配送","はいそう","delivery"],
+    ["合わせて","あわせて","add up to"],
+    ["ポイント","ポイント","point"],
+    ["貯まる","たまる","to accumulate"],
+    ["変わる","かわる","to change"],
+    ["安くなりますか？","やすくなりますか？","Can you lower the price?"],
+    ["おいくらぐらいでお探しですか？","おいくらぐらいでおさがしですか？","How much is your budget? (polite expression)"],
+    ["どちらにお住まいですか？","どちらにおすまいですか？","Where do you live? (polite expression)"],
+    ["ご利用になりますか？","ごりようになりますか？","Will you be using ~ ? (polite expression)"]
+  ];
+
+  let order = words.map((_, i) => i);
+  let pos = 0;
+  let flipped = false;
+
+  const flipCard = document.getElementById('flipCard');
+  const cardScene = document.getElementById('cardScene');
+  const kanjiText = document.getElementById('kanjiText');
+  const kanjiSmall = document.getElementById('kanjiSmall');
+  const readingText = document.getElementById('readingText');
+  const meaningText = document.getElementById('meaningText');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.9;
+    window.speechSynthesis.speak(utter);
+  }
+
+  document.getElementById('speakBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const [, reading] = words[order[pos]];
+    speak(reading);
+  });
+
+  function render(){
+    const [kanji, reading, meaning] = words[order[pos]];
+    kanjiText.textContent = kanji;
+    kanjiSmall.textContent = kanji;
+    readingText.textContent = reading;
+    meaningText.textContent = meaning;
+    counter.textContent = `${pos + 1} / ${words.length}`;
+    progressFill.style.width = `${((pos + 1) / words.length) * 100}%`;
+  }
+
+  function setFlipped(state){
+    flipped = state;
+    flipCard.classList.toggle('flipped', flipped);
+  }
+
+  function go(delta){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setFlipped(false);
+    pos = (pos + delta + order.length) % order.length;
+    setTimeout(render, delta === 0 ? 0 : 120);
+  }
+
+  function shuffle(){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    pos = 0;
+    setFlipped(false);
+    render();
+  }
+
+  cardScene.addEventListener('click', () => setFlipped(!flipped));
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+  document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); setFlipped(!flipped); }
+    if(e.code === 'ArrowRight'){ go(1); }
+    if(e.code === 'ArrowLeft'){ go(-1); }
+  });
+
+  render();
+</script>
+</body>
+</html>
