@@ -59,41 +59,41 @@
   .hidden-panel{ display:none; }
 </style>
 </head>
-<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-5 py-12">
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-4 py-8 sm:px-5 sm:py-12">
 
   <!-- header -->
-  <div class="text-center mb-10">
-    <h1 class="serif text-3xl sm:text-4xl font-bold">いろどり ことばカード</h1>
-    <p class="text-sm text-[var(--ink)]/60 mt-2">レベルとレッスンを選んでください</p>
+  <div class="text-center mb-7 sm:mb-10">
+    <h1 class="serif text-2xl sm:text-4xl font-bold leading-tight">いろどり ことばカード</h1>
+    <p class="text-xs sm:text-sm text-[var(--ink)]/60 mt-2">レベルとレッスンを選んでください</p>
   </div>
 
   <!-- level selection -->
-  <div id="levelSelect" class="w-full max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-5">
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="starter" data-prefix="s" data-count="18" data-labelformat="第{n}課">
+  <div id="levelSelect" class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="starter" data-prefix="s" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--indigo)]">1</div>
-      <div>
-        <p class="serif text-lg font-bold">Irodori 1</p>
+      <div class="min-w-0">
+        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 1</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="a2" data-prefix="a" data-count="18" data-labelformat="第{n}課">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="a2" data-prefix="a" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--seal)]">2</div>
-      <div>
-        <p class="serif text-lg font-bold">Irodori 2</p>
+      <div class="min-w-0">
+        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 2</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="irodori3" data-prefix="i" data-count="18" data-labelformat="第{n}課">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="irodori3" data-prefix="i" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--gold)]">3</div>
-      <div>
-        <p class="serif text-lg font-bold">Irodori 3</p>
+      <div class="min-w-0">
+        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 3</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="mnn1" data-prefix="m" data-count="25" data-labelformat="Lesson {n}">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="mnn1" data-prefix="m" data-count="25" data-labelformat="Lesson {n}">
       <div class="badge" style="color:#6B7F4F;">M</div>
-      <div>
-        <p class="serif text-lg font-bold">Minna no Nihongo 1</p>
+      <div class="min-w-0">
+        <p class="serif text-base sm:text-lg font-bold leading-snug">Minna no Nihongo 1</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">Lesson 1〜Lesson 25</p>
       </div>
     </button>
