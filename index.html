@@ -68,26 +68,33 @@
   </div>
 
   <!-- level selection -->
-  <div id="levelSelect" class="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-3 gap-6">
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="starter" data-prefix="s">
+  <div id="levelSelect" class="w-full max-w-4xl grid grid-cols-2 sm:grid-cols-4 gap-5">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="starter" data-prefix="s" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--indigo)]">1</div>
       <div>
         <p class="serif text-lg font-bold">Irodori 1</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="a2" data-prefix="a">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="a2" data-prefix="a" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--seal)]">2</div>
       <div>
         <p class="serif text-lg font-bold">Irodori 2</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
       </div>
     </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="irodori3" data-prefix="i">
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="irodori3" data-prefix="i" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--gold)]">3</div>
       <div>
         <p class="serif text-lg font-bold">Irodori 3</p>
         <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
+      </div>
+    </button>
+    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left active:scale-95 transition-transform" data-level="mnn1" data-prefix="m" data-count="25" data-labelformat="Lesson {n}">
+      <div class="badge" style="color:#6B7F4F;">M</div>
+      <div>
+        <p class="serif text-lg font-bold">Minna no Nihongo 1</p>
+        <p class="text-xs text-[var(--ink)]/60 mt-1">Lesson 1〜Lesson 25</p>
       </div>
     </button>
   </div>
@@ -101,7 +108,7 @@
     <div id="lessonGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-4"></div>
   </div>
 
-  <p class="text-xs text-[var(--ink)]/35 mt-12">Irodori 1・2・3 フラッシュカード</p>
+  <p class="text-xs text-[var(--ink)]/35 mt-12">Irodori 1・2・3 ・ Minna no Nihongo 1 フラッシュカード</p>
   <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
 
 <script>
@@ -114,21 +121,22 @@
   const levelNames = {
     starter: 'Irodori 1',
     a2: 'Irodori 2',
-    irodori3: 'Irodori 3'
+    irodori3: 'Irodori 3',
+    mnn1: 'Minna no Nihongo 1'
   };
 
-  function showLessons(level, prefix){
+  function showLessons(level, prefix, count, labelFormat){
     lessonGrid.innerHTML = '';
     levelLabel.textContent = levelNames[level];
 
-    for(let n = 1; n <= 18; n++){
+    for(let n = 1; n <= count; n++){
       const a = document.createElement('a');
       a.href = `${prefix}${n}.html`;
       a.className = 'lesson-card fade-in rounded-lg flex flex-col items-center justify-center py-6 active:scale-95 transition-transform';
       a.style.animationDelay = `${n * 0.02}s`;
       a.innerHTML = `
         <span class="serif text-3xl font-bold leading-none">${n}</span>
-        <span class="text-xs text-[var(--ink)]/60 mt-2">第${n}課</span>
+        <span class="text-xs text-[var(--ink)]/60 mt-2">${labelFormat.replace('{n}', n)}</span>
       `;
       lessonGrid.appendChild(a);
     }
@@ -140,7 +148,9 @@
 
   levelSelect.querySelectorAll('.level-card').forEach(card => {
     card.addEventListener('click', () => {
-      showLessons(card.dataset.level, card.dataset.prefix);
+      const count = parseInt(card.dataset.count, 10) || 18;
+      const labelFormat = card.dataset.labelformat || '第{n}課';
+      showLessons(card.dataset.level, card.dataset.prefix, count, labelFormat);
     });
   });
 
