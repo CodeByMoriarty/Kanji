@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12 文型レビュー</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FBF6EC;
+    --paper-deep:#F3ECDD;
+    --ink:#2A241C;
+    --accent:#B5871D;
+    --accent-deep:#8C6A16;
+    --indigo:#33506A;
+    --line:#E7D9B0;
+  }
+  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .paper-texture{
+    background-image:
+      radial-gradient(circle at 20% 15%, rgba(181,135,29,0.07), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(51,80,106,0.05), transparent 45%);
+  }
+  ruby{ ruby-position: over; }
+  rt{ font-size:0.55em; color:inherit; opacity:.75; font-weight:400; }
+  .scene{ perspective:1600px; }
+  .flip-card{
+    position:relative; width:100%; height:100%;
+    transform-style:preserve-3d;
+    transition:transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .flip-card.flipped{ transform:rotateY(180deg); }
+  .face{
+    position:absolute; inset:0;
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+    border-radius:10px;
+  }
+  .face-back{ transform:rotateY(180deg); overflow-y:auto; }
+  .chip{
+    display:inline-flex; align-items:center; gap:4px;
+    padding:3px 10px; border-radius:999px;
+    font-size:11px; letter-spacing:.03em;
+    background:var(--accent); color:#fff;
+  }
+  .num-badge{
+    width:22px; height:22px; border-radius:999px;
+    background:var(--accent); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:700; flex-shrink:0;
+  }
+  .progress-track{ background:var(--line); }
+  .progress-fill{ background:var(--accent); transition:width .3s ease; }
+  .ctrl-btn{
+    border:1px solid var(--line); background:var(--paper);
+    transition:background .15s ease, border-color .15s ease;
+  }
+  .ctrl-btn:hover{ background:var(--paper-deep); border-color:var(--accent); }
+  .ctrl-btn:active{ transform:translateY(1px); }
+  .example-card{
+    background:rgba(251,246,236,0.06);
+    border:1px solid rgba(251,246,236,0.14);
+    border-radius:8px;
+  }
+  .speak-mini{
+    width:26px; height:26px; border-radius:999px;
+    border:1px solid rgba(251,246,236,0.3);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); flex-shrink:0;
+  }
+  .speak-mini:hover{ background:rgba(251,246,236,0.12); }
+  @media (prefers-reduced-motion: reduce){
+    .flip-card{ transition:none; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-4 py-8 sm:px-5 sm:py-10">
+
+  <!-- back to index -->
+  <a href="index.html" class="w-full max-w-md text-xs text-[var(--indigo)] hover:text-[var(--accent-deep)] transition-colors mb-4 inline-flex items-center gap-1">
+    <span aria-hidden="true">←</span> 一覧に戻る
+  </a>
+
+  <!-- header -->
+  <div class="w-full max-w-md flex items-baseline justify-between mb-1">
+    <div>
+      <p class="text-xs tracking-wide text-[var(--accent-deep)]">Irodori 3・文型レビュー</p>
+      <h1 class="text-xl font-bold">Lesson 12 文型レビュー</h1>
+    </div>
+    <p id="counter" class="text-sm text-[var(--ink)]/60">1 / 5</p>
+  </div>
+
+  <!-- progress -->
+  <div class="w-full max-w-md h-[3px] progress-track rounded-full mb-8 overflow-hidden">
+    <div id="progressFill" class="h-full progress-fill" style="width:20%"></div>
+  </div>
+
+  <!-- card -->
+  <div class="scene w-full max-w-md h-96 sm:h-[26rem] cursor-pointer select-none" id="cardScene">
+    <div class="flip-card" id="flipCard">
+
+      <!-- front -->
+      <div class="face face-front bg-white border border-[var(--line)] shadow-[0_10px_30px_-14px_rgba(42,36,28,0.35)] flex flex-col items-center justify-center px-6">
+        <div class="absolute top-4 left-4 chip">Lesson 12</div>
+        <div id="numBadge" class="absolute top-4 right-4 num-badge">1</div>
+        <p id="patternText" class="font-bold text-2xl sm:text-3xl leading-snug text-center"></p>
+        <p class="absolute bottom-5 text-xs text-[var(--ink)]/40 tracking-wide">タップして例文を見る</p>
+      </div>
+
+      <!-- back -->
+      <div class="face face-back bg-[var(--indigo)] text-[var(--paper)] flex flex-col px-6 py-6">
+        <p id="explanationText" class="text-sm leading-relaxed mb-4 text-[var(--paper)]/90"></p>
+        <div class="w-10 h-[2px] mb-4" style="background:var(--accent);"></div>
+        <div id="examplesList" class="flex flex-col gap-3 text-sm overflow-y-auto"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- controls -->
+  <div class="w-full max-w-md flex items-center justify-between mt-8 gap-3">
+    <button id="prevBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">← 前</button>
+    <button id="shuffleBtn" class="ctrl-btn px-4 py-3 rounded text-sm">シャッフル</button>
+    <button id="nextBtn" class="ctrl-btn flex-1 py-3 rounded text-sm">次 →</button>
+  </div>
+
+  <p class="text-xs text-[var(--ink)]/40 mt-6">タップで裏返す・矢印キーで移動・スピーカーで発音</p>
+
+<script>
+  // [pattern, explanation, [[jp_with_furigana_markup, jp_plain_for_speech, en], ...]]
+  // furigana markup: {kanji|reading}
+  const patterns = [
+    ["V-るまで、～", "Marks a point in time something continues up until — “until ~.”", [["{手元|てもと}に{届|とど}くまで、2{日|にち}しかかかりませんでした。", "手元に届くまで、2日しかかかりませんでした。", "It only took two days until it arrived in my hands."], ["{終|お}わるまで{待|ま}ちます。", "終わるまで待ちます。", "I'll wait until it's finished."], ["{電車|でんしゃ}が{来|く}るまで、ここにいます。", "電車が来るまで、ここにいます。", "I'll stay here until the train comes."]]],
+    ["V-にくいです／V-やすいです", "Describes how easy or difficult it is to do something — “hard to ~” / “easy to ~.”", [["この{掃除機|そうじき}は、{重|おも}くて、{使|つか}いにくいですね。", "この掃除機は、重くて、使いにくいですね。", "This vacuum cleaner is heavy and hard to use."], ["トーシマの{掃除機|そうじき}のほうが{動|うご}かしやすいですよ。", "トーシマの掃除機のほうが動かしやすいですよ。", "The Toshima vacuum cleaner is easier to move around."], ["この{本|ほん}は{字|じ}が{小|ちい}さくて、{読|よ}みにくいです。", "この本は字が小さくて、読みにくいです。", "This book has small letters, so it's hard to read."]]],
+    ["N1とN2、どちら／どっちが～か？／（N1より）N2のほうが～", "Compares two things, asking or stating which one has more of a quality.", [["どっちが{使|つか}いやすいですか？", "どっちが使いやすいですか？", "Which one is easier to use?"], ["トーシマの{方|ほう}がミツバシより{軽|かる}くて、{動|うご}かしやすいですよ。", "トーシマの方がミツバシより軽くて、動かしやすいですよ。", "The Toshima one is lighter and easier to move than the Mitsubashi one."], ["コーヒーとお{茶|ちゃ}、どちらが{好|す}きですか？", "コーヒーとお茶、どちらが好きですか？", "Which do you like better, coffee or tea?"]]]
+  ];
+
+  function furiganaToHtml(text){
+    return text.replace(/\{([^|]+)\|([^}]+)\}/g, '<ruby>$1<rt>$2</rt></ruby>');
+  }
+
+  let order = patterns.map((_, i) => i);
+  let pos = 0;
+  let flipped = false;
+
+  const flipCard = document.getElementById('flipCard');
+  const cardScene = document.getElementById('cardScene');
+  const patternText = document.getElementById('patternText');
+  const numBadge = document.getElementById('numBadge');
+  const explanationText = document.getElementById('explanationText');
+  const examplesList = document.getElementById('examplesList');
+  const counter = document.getElementById('counter');
+  const progressFill = document.getElementById('progressFill');
+
+  function speak(text){
+    if(!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 0.85;
+    window.speechSynthesis.speak(utter);
+  }
+
+  function render(){
+    const [pattern, explanation, examples] = patterns[order[pos]];
+    patternText.innerHTML = furiganaToHtml(pattern);
+    numBadge.textContent = pos + 1;
+    explanationText.textContent = explanation;
+    examplesList.innerHTML = examples.map(([jpMarkup, jpPlain, en], i) => `
+      <div class="example-card p-3">
+        <div class="flex items-start justify-between gap-2 mb-1">
+          <div class="flex items-start gap-2">
+            <span class="num-badge mt-0.5">${i + 1}</span>
+            <p class="leading-relaxed">${furiganaToHtml(jpMarkup)}</p>
+          </div>
+          <button class="speak-mini speak-example" data-text="${jpPlain.replace(/"/g, '&quot;')}" aria-label="発音を聞く" title="発音を聞く">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+              <path d="M3 10v4h4l5 5V5L7 10H3z"/>
+              <path d="M16.5 12a4.5 4.5 0 0 0-2.5-4.03v8.06A4.5 4.5 0 0 0 16.5 12z"/>
+            </svg>
+          </button>
+        </div>
+        <p class="text-[var(--paper)]/70 text-xs pl-7">${en}</p>
+      </div>
+    `).join('');
+    examplesList.querySelectorAll('.speak-example').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        speak(btn.dataset.text);
+      });
+    });
+    counter.textContent = `${pos + 1} / ${patterns.length}`;
+    progressFill.style.width = `${((pos + 1) / patterns.length) * 100}%`;
+  }
+
+  function setFlipped(state){
+    flipped = state;
+    flipCard.classList.toggle('flipped', flipped);
+  }
+
+  function go(delta){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    setFlipped(false);
+    pos = (pos + delta + order.length) % order.length;
+    setTimeout(render, delta === 0 ? 0 : 120);
+  }
+
+  function shuffle(){
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    for(let i = order.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [order[i], order[j]] = [order[j], order[i]];
+    }
+    pos = 0;
+    setFlipped(false);
+    render();
+  }
+
+  cardScene.addEventListener('click', () => setFlipped(!flipped));
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+  document.getElementById('shuffleBtn').addEventListener('click', shuffle);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.code === 'Space' || e.code === 'Enter'){ e.preventDefault(); setFlipped(!flipped); }
+    if(e.code === 'ArrowRight'){ go(1); }
+    if(e.code === 'ArrowLeft'){ go(-1); }
+  });
+
+  render();
+</script>
+</body>
+</html>
