@@ -57,6 +57,17 @@
   .fade-in{ animation:fadeIn .35s ease both; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
   .hidden-panel{ display:none; }
+  .chevron{
+    width:18px; height:18px; color:var(--ink); opacity:.4;
+    transition:transform .25s ease;
+  }
+  .level-card.expanded .chevron{ transform:rotate(180deg); opacity:.8; }
+  .accordion-panel{
+    grid-column:1 / -1;
+    max-height:0; overflow:hidden;
+    transition:max-height .35s ease;
+  }
+  .accordion-inner{ padding:14px 2px 20px; }
 </style>
 </head>
 <body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-4 py-8 sm:px-5 sm:py-12">
@@ -160,33 +171,96 @@
     sg3: 'Irodori 3 文型'
   };
 
-  function showLessons(level, prefix, count, labelFormat){
-    lessonGrid.innerHTML = '';
-    levelLabel.textContent = levelNames[level];
+  const isMobile = () => window.matchMedia('(max-width: 639px)').matches;
 
+  function buildLessonTiles(prefix, count, labelFormat){
+    const wrap = document.createElement('div');
+    wrap.className = 'grid grid-cols-3 sm:grid-cols-6 gap-3';
     for(let n = 1; n <= count; n++){
       const a = document.createElement('a');
       a.href = `${prefix}${n}.html`;
-      a.className = 'lesson-card fade-in rounded-lg flex flex-col items-center justify-center py-6 active:scale-95 transition-transform';
+      a.className = 'lesson-card fade-in rounded-lg flex flex-col items-center justify-center py-5 active:scale-95 transition-transform';
       a.style.animationDelay = `${n * 0.02}s`;
       a.innerHTML = `
-        <span class="serif text-3xl font-bold leading-none">${n}</span>
-        <span class="text-xs text-[var(--ink)]/60 mt-2">${labelFormat.replace('{n}', n)}</span>
+        <span class="serif text-2xl font-bold leading-none">${n}</span>
+        <span class="text-[11px] text-[var(--ink)]/60 mt-1.5 text-center px-1">${labelFormat.replace('{n}', n)}</span>
       `;
-      lessonGrid.appendChild(a);
+      wrap.appendChild(a);
     }
+    return wrap;
+  }
+
+  function showLessons(level, prefix, count, labelFormat){
+    lessonGrid.innerHTML = '';
+    levelLabel.textContent = levelNames[level];
+    lessonGrid.appendChild(buildLessonTiles(prefix, count, labelFormat));
 
     pickerSection.classList.add('hidden-panel');
     lessonPanel.classList.remove('hidden-panel');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  document.querySelectorAll('.level-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const count = parseInt(card.dataset.count, 10) || 18;
-      const labelFormat = card.dataset.labelformat || '第{n}課';
-      showLessons(card.dataset.level, card.dataset.prefix, count, labelFormat);
+  function closeAllAccordions(){
+    document.querySelectorAll('.accordion-panel').forEach(panel => {
+      panel.style.maxHeight = '0px';
+      setTimeout(() => panel.remove(), 350);
     });
+    document.querySelectorAll('.level-card.expanded').forEach(c => c.classList.remove('expanded'));
+  }
+
+  function toggleAccordion(card){
+    const alreadyOpen = card.classList.contains('expanded');
+    const existingPanel = card.nextElementSibling && card.nextElementSibling.classList.contains('accordion-panel')
+      ? card.nextElementSibling : null;
+
+    closeAllAccordions();
+
+    if(alreadyOpen && existingPanel){
+      // was open before this toggle call — just leave it closed
+      return;
+    }
+
+    const count = parseInt(card.dataset.count, 10) || 18;
+    const labelFormat = card.dataset.labelformat || '第{n}課';
+
+    const panel = document.createElement('div');
+    panel.className = 'accordion-panel';
+    const inner = document.createElement('div');
+    inner.className = 'accordion-inner';
+    inner.appendChild(buildLessonTiles(card.dataset.prefix, count, labelFormat));
+    panel.appendChild(inner);
+
+    card.insertAdjacentElement('afterend', panel);
+    card.classList.add('expanded');
+
+    requestAnimationFrame(() => {
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    });
+  }
+
+  document.querySelectorAll('.level-card').forEach(card => {
+    const chevron = document.createElement('svg');
+    chevron.setAttribute('viewBox', '0 0 24 24');
+    chevron.setAttribute('fill', 'none');
+    chevron.setAttribute('stroke', 'currentColor');
+    chevron.setAttribute('stroke-width', '2');
+    chevron.className = 'chevron ml-auto sm:hidden';
+    chevron.innerHTML = '<path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>';
+    card.appendChild(chevron);
+
+    card.addEventListener('click', () => {
+      if(isMobile()){
+        toggleAccordion(card);
+      } else {
+        const count = parseInt(card.dataset.count, 10) || 18;
+        const labelFormat = card.dataset.labelformat || '第{n}課';
+        showLessons(card.dataset.level, card.dataset.prefix, count, labelFormat);
+      }
+    });
+  });
+
+  window.matchMedia('(max-width: 639px)').addEventListener('change', (e) => {
+    if(!e.matches) closeAllAccordions();
   });
 
   backBtn.addEventListener('click', () => {
