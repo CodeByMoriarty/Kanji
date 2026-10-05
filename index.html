@@ -70,20 +70,21 @@
   .accordion-inner{ padding:14px 2px 20px; }
 </style>
 </head>
-<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-4 py-8 sm:px-5 sm:py-12">
+<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-4 py-8 sm:px-6 sm:py-14">
 
   <!-- header -->
-  <div class="text-center mb-7 sm:mb-10">
-    <h1 class="serif text-2xl sm:text-4xl font-bold leading-tight">いろどり ことばカード</h1>
-    <p class="text-xs sm:text-sm text-[var(--ink)]/60 mt-2">レベルとレッスンを選んでください</p>
+  <div class="text-center mb-8 sm:mb-14">
+    <h1 class="serif text-2xl sm:text-5xl font-bold leading-tight">いろどり ことばカード</h1>
+    <p class="text-xs sm:text-base text-[var(--ink)]/60 mt-2 sm:mt-3">レベルとレッスンを選んでください</p>
+    <div class="hidden sm:block w-16 h-[2px] mx-auto mt-5" style="background:var(--gold);"></div>
   </div>
 
   <!-- picker section (vocab + grammar) -->
-  <div id="pickerSection" class="w-full flex flex-col items-center">
+  <div id="pickerSection" class="w-full max-w-5xl flex flex-col items-center">
 
   <!-- level selection: vocabulary -->
-  <p class="w-full max-w-4xl text-xs tracking-wide text-[var(--ink)]/50 mb-2">ことば Vocabulary</p>
-  <div id="levelSelect" class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8">
+  <p class="w-full text-xs sm:text-sm tracking-wide text-[var(--ink)]/50 mb-3 sm:mb-4 font-medium">ことば Vocabulary</p>
+  <div id="levelSelect" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-14">
     <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="starter" data-prefix="s" data-count="18" data-labelformat="第{n}課">
       <div class="badge text-[var(--indigo)]">1</div>
       <div class="min-w-0">
@@ -115,8 +116,8 @@
   </div>
 
   <!-- level selection: sentence patterns -->
-  <p class="w-full max-w-4xl text-xs tracking-wide text-[var(--ink)]/50 mb-2">文型 Sentence Patterns</p>
-  <div id="grammarSelect" class="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
+  <p class="w-full text-xs sm:text-sm tracking-wide text-[var(--ink)]/50 mb-3 sm:mb-4 font-medium">文型 Sentence Patterns</p>
+  <div id="grammarSelect" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
     <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="sg1" data-prefix="sg" data-count="18" data-labelformat="第{n}課">
       <div class="badge" style="color:#D1477A;">1</div>
       <div class="min-w-0">
@@ -143,12 +144,12 @@
   </div>
 
   <!-- lesson grid -->
-  <div id="lessonPanel" class="hidden-panel w-full max-w-2xl mt-10">
-    <div class="flex items-center justify-between mb-5">
+  <div id="lessonPanel" class="hidden-panel w-full max-w-5xl mt-6 sm:mt-10">
+    <div class="flex items-center justify-between mb-5 sm:mb-7">
       <button id="backBtn" class="text-sm text-[var(--indigo)] hover:text-[var(--seal)] transition-colors">← レベルに戻る</button>
-      <p id="levelLabel" class="serif text-sm text-[var(--ink)]/70"></p>
+      <p id="levelLabel" class="serif text-sm sm:text-base text-[var(--ink)]/70"></p>
     </div>
-    <div id="lessonGrid" class="grid grid-cols-3 sm:grid-cols-6 gap-4"></div>
+    <div id="lessonGrid" class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-9 gap-3 sm:gap-4"></div>
   </div>
 
   <p class="text-xs text-[var(--ink)]/35 mt-12">Irodori 1・2・3 ・ Minna no Nihongo 1 フラッシュカード</p>
