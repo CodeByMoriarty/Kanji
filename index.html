@@ -1,274 +1,202 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>いろどり ことばカード</title>
+<title>Nihongo Cards — Japanese Flashcards</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#FBF6EC;
-    --paper-deep:#F3ECDD;
-    --ink:#2A241C;
-    --seal:#A2403B;
-    --indigo:#33506A;
-    --gold:#B4893F;
-    --line:#DED2B6;
+    --paper:#FBF6EC; --paper-deep:#F3ECDD; --ink:#2A241C; --line:#E4D8BE; --seal:#A2403B; --gold:#B4893F;
   }
-  body{ background:var(--paper); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
-  .serif{ font-family:'Zen Kaku Gothic New', sans-serif; }
-  .paper-texture{
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--paper); color:var(--ink); font-family:'Zen Kaku Gothic New', system-ui, sans-serif; }
+  .paper{
     background-image:
-      radial-gradient(circle at 15% 10%, rgba(180,137,63,0.06), transparent 40%),
-      radial-gradient(circle at 90% 85%, rgba(51,80,106,0.06), transparent 45%);
+      radial-gradient(circle at 12% 8%, rgba(180,137,63,.08), transparent 40%),
+      radial-gradient(circle at 92% 90%, rgba(51,80,106,.07), transparent 45%);
   }
-  .level-card{
-    border:1px solid var(--line); background:#fff;
-    transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-  }
-  .level-card:hover{
-    transform:translateY(-3px);
-    border-color:var(--gold);
-    box-shadow:0 14px 28px -18px rgba(42,36,28,0.4);
-  }
-  .level-card.active{
-    border-color:var(--seal);
-    box-shadow:0 14px 28px -18px rgba(162,64,59,0.35);
-  }
-  .badge{
-    width:48px; height:48px; border:2px solid currentColor;
-    border-radius:8px; display:flex; align-items:center; justify-content:center;
-    font-size:18px; font-weight:700; letter-spacing:.02em; flex-shrink:0;
-  }
-  @media (min-width: 640px){
-    .badge{ width:60px; height:60px; font-size:22px; }
-  }
-  .lesson-card{
-    border:1px solid var(--line); background:#fff;
-    transition:transform .15s ease, border-color .15s ease, background .15s ease;
-  }
-  .lesson-card:hover{
-    transform:translateY(-2px);
-    border-color:var(--gold);
-    background:var(--paper-deep);
-  }
-  .fade-in{ animation:fadeIn .35s ease both; }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-  .hidden-panel{ display:none; }
-  .chevron{
-    width:18px; height:18px; color:var(--ink); opacity:.4;
-    transition:transform .25s ease;
-  }
-  .level-card.expanded .chevron{ transform:rotate(180deg); opacity:.8; }
-  .accordion-panel{
-    grid-column:1 / -1;
-    max-height:0; overflow:hidden;
-    transition:max-height .35s ease;
-  }
-  .accordion-inner{ padding:14px 2px 20px; }
+  .series-card{ transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+  .series-card:hover{ transform:translateY(-2px); box-shadow:0 14px 28px -18px rgba(42,36,28,.45); }
+  .series-card:active{ transform:scale(.98); }
+  .series-card.is-open{ box-shadow:0 0 0 2px var(--c); border-color:var(--c); }
+  .chev{ transition:transform .25s ease; }
+  .is-open .chev{ transform:rotate(180deg); }
+  .panel{ animation:pop .25s ease both; }
+  @keyframes pop{ from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:none} }
+  .tile{ transition:transform .12s ease, background .12s ease, border-color .12s ease; }
+  a.tile:hover{ background:var(--paper-deep); border-color:var(--c); transform:translateY(-2px); }
+  a.tile:active{ transform:scale(.95); }
+  @media (prefers-reduced-motion: reduce){ *{ animation:none !important; transition:none !important; } }
 </style>
 </head>
-<body class="min-h-screen paper-texture text-[var(--ink)] flex flex-col items-center px-4 py-8 sm:px-6 sm:py-14">
+<body class="paper min-h-screen">
 
-  <!-- header -->
-  <div class="text-center mb-8 sm:mb-14">
-    <h1 class="serif text-2xl sm:text-5xl font-bold leading-tight">いろどり ことばカード</h1>
-    <p class="text-xs sm:text-base text-[var(--ink)]/60 mt-2 sm:mt-3">レベルとレッスンを選んでください</p>
-    <div class="hidden sm:block w-16 h-[2px] mx-auto mt-5" style="background:var(--gold);"></div>
-  </div>
-
-  <!-- picker section (vocab + grammar) -->
-  <div id="pickerSection" class="w-full max-w-5xl flex flex-col items-center">
-
-  <!-- level selection: vocabulary -->
-  <p class="w-full text-xs sm:text-sm tracking-wide text-[var(--ink)]/50 mb-3 sm:mb-4 font-medium">ことば Vocabulary</p>
-  <div id="levelSelect" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-14">
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="starter" data-prefix="s" data-count="18" data-labelformat="第{n}課">
-      <div class="badge text-[var(--indigo)]">1</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 1</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
+  <!-- top bar -->
+  <header class="border-b border-[var(--line)] bg-[var(--paper)]/80 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <span class="w-8 h-8 rounded-lg bg-[var(--ink)] text-[var(--paper)] flex items-center justify-center font-black text-lg">あ</span>
+        <span class="font-bold tracking-tight">Nihongo Cards</span>
       </div>
-    </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="a2" data-prefix="a" data-count="18" data-labelformat="第{n}課">
-      <div class="badge text-[var(--seal)]">2</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 2</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
-      </div>
-    </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="irodori3" data-prefix="i" data-count="18" data-labelformat="第{n}課">
-      <div class="badge text-[var(--gold)]">3</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 3</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">第1課〜第18課</p>
-      </div>
-    </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="mnn1" data-prefix="m" data-count="25" data-labelformat="Lesson {n}">
-      <div class="badge" style="color:#6B7F4F;">M</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Minna no Nihongo 1</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">Lesson 1〜Lesson 25</p>
-      </div>
-    </button>
-  </div>
-
-  <!-- level selection: sentence patterns -->
-  <p class="w-full text-xs sm:text-sm tracking-wide text-[var(--ink)]/50 mb-3 sm:mb-4 font-medium">文型 Sentence Patterns</p>
-  <div id="grammarSelect" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="sg1" data-prefix="sg" data-count="18" data-labelformat="第{n}課">
-      <div class="badge" style="color:#D1477A;">1</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 1</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">文型 Lesson 1〜18</p>
-      </div>
-    </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="sg2" data-prefix="ag" data-count="18" data-labelformat="第{n}課">
-      <div class="badge" style="color:#C97A2B;">2</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 2</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">文型 Lesson 1〜18</p>
-      </div>
-    </button>
-    <button class="level-card rounded-lg p-4 sm:p-7 flex items-center gap-4 sm:gap-5 text-left w-full active:scale-95 transition-transform" data-level="sg3" data-prefix="ig" data-count="18" data-labelformat="第{n}課">
-      <div class="badge" style="color:#B59B1D;">3</div>
-      <div class="min-w-0">
-        <p class="serif text-base sm:text-lg font-bold leading-snug">Irodori 3</p>
-        <p class="text-xs text-[var(--ink)]/60 mt-1">文型 Lesson 1〜18</p>
-      </div>
-    </button>
-  </div>
-
-  </div>
-
-  <!-- lesson grid -->
-  <div id="lessonPanel" class="hidden-panel w-full max-w-5xl mt-6 sm:mt-10">
-    <div class="flex items-center justify-between mb-5 sm:mb-7">
-      <button id="backBtn" class="text-sm text-[var(--indigo)] hover:text-[var(--seal)] transition-colors">← レベルに戻る</button>
-      <p id="levelLabel" class="serif text-sm sm:text-base text-[var(--ink)]/70"></p>
+      <span class="hidden sm:inline text-xs text-[var(--ink)]/50">日本語フラッシュカード</span>
     </div>
-    <div id="lessonGrid" class="grid grid-cols-3 sm:grid-cols-6 lg:grid-cols-9 gap-3 sm:gap-4"></div>
-  </div>
+  </header>
 
-  <p class="text-xs text-[var(--ink)]/35 mt-12">Irodori 1・2・3 ・ Minna no Nihongo 1 フラッシュカード</p>
-  <p class="text-xs text-[var(--ink)]/30 mt-2">Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)] transition-colors">DORU</a></p>
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
+
+    <!-- hero -->
+    <section class="text-center pt-10 pb-8 sm:pt-16 sm:pb-12">
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight">Japanese Flashcards</h1>
+      <p class="mt-3 sm:mt-4 text-sm sm:text-lg text-[var(--ink)]/60 max-w-2xl mx-auto">
+        Vocabulary and sentence patterns, lesson by lesson. Pick a book, pick a lesson, flip the cards.
+      </p>
+    </section>
+
+    <!-- tabs -->
+    <div class="flex justify-center mb-8 sm:mb-10">
+      <div id="tabs" class="inline-flex p-1 rounded-full bg-[var(--paper-deep)] border border-[var(--line)] w-full sm:w-auto" role="tablist">
+        <button data-tab="vocab" role="tab" class="tab flex-1 sm:flex-none px-5 sm:px-8 py-2.5 rounded-full text-sm font-medium transition">
+          ことば <span class="text-xs opacity-60">Vocabulary</span>
+        </button>
+        <button data-tab="grammar" role="tab" class="tab flex-1 sm:flex-none px-5 sm:px-8 py-2.5 rounded-full text-sm font-medium transition">
+          文型 <span class="text-xs opacity-60">Sentence Patterns</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- series grid + panel -->
+    <section id="seriesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5"></section>
+    <div id="desktopPanelSlot" class="mt-5"></div>
+
+    <footer class="mt-16 text-center text-xs text-[var(--ink)]/40 space-y-1">
+      <p>Irodori 1・2・3 &nbsp;·&nbsp; Minna no Nihongo 1</p>
+      <p>Made by <a href="https://andrewl.cv" target="_blank" rel="noopener" class="underline hover:text-[var(--seal)]">DORU</a></p>
+    </footer>
+  </main>
 
 <script>
-  const pickerSection = document.getElementById('pickerSection');
-  const lessonPanel = document.getElementById('lessonPanel');
-  const lessonGrid = document.getElementById('lessonGrid');
-  const levelLabel = document.getElementById('levelLabel');
-  const backBtn = document.getElementById('backBtn');
-
-  const levelNames = {
-    starter: 'Irodori 1',
-    a2: 'Irodori 2',
-    irodori3: 'Irodori 3',
-    mnn1: 'Minna no Nihongo 1',
-    sg1: 'Irodori 1 文型',
-    sg2: 'Irodori 2 文型',
-    sg3: 'Irodori 3 文型'
+  // label: lesson tile subtitle; avail: lessons that actually exist (others shown as "coming soon")
+  const SERIES = {
+    vocab: [
+      { id:'v1', name:'Irodori 1',          sub:'入門 · Starter',      prefix:'s',  count:18, avail:18, label:'第{n}課',    color:'#33506A', badge:'1' },
+      { id:'v2', name:'Irodori 2',          sub:'初級1 · Elementary 1', prefix:'a',  count:18, avail:18, label:'第{n}課',    color:'#A2403B', badge:'2' },
+      { id:'v3', name:'Irodori 3',          sub:'初級2 · Elementary 2', prefix:'i',  count:18, avail:18, label:'第{n}課',    color:'#B4893F', badge:'3' },
+      { id:'vm', name:'Minna no Nihongo 1', sub:'みんなの日本語 I',      prefix:'m',  count:25, avail:25, label:'Lesson {n}', color:'#6B7F4F', badge:'M' }
+    ],
+    grammar: [
+      { id:'g1', name:'Irodori 1', sub:'入門 · Sentence patterns',      prefix:'sg', count:18, avail:18, label:'第{n}課', color:'#D1477A', badge:'1' },
+      { id:'g2', name:'Irodori 2', sub:'初級1 · Sentence patterns',     prefix:'ag', count:18, avail:9,  label:'第{n}課', color:'#C97A2B', badge:'2' },
+      { id:'g3', name:'Irodori 3', sub:'初級2 · Sentence patterns',     prefix:'ig', count:18, avail:18, label:'第{n}課', color:'#B59B1D', badge:'3' }
+    ]
   };
 
-  const isMobile = () => window.matchMedia('(max-width: 639px)').matches;
+  const grid = document.getElementById('seriesGrid');
+  const slot = document.getElementById('desktopPanelSlot');
+  const tabButtons = document.querySelectorAll('.tab');
+  let currentTab = 'vocab';
+  let openId = null;
 
-  function buildLessonTiles(prefix, count, labelFormat){
-    const wrap = document.createElement('div');
-    wrap.className = 'grid grid-cols-3 sm:grid-cols-6 gap-3';
-    for(let n = 1; n <= count; n++){
-      const a = document.createElement('a');
-      a.href = `${prefix}${n}.html`;
-      a.className = 'lesson-card fade-in rounded-lg flex flex-col items-center justify-center py-5 active:scale-95 transition-transform';
-      a.style.animationDelay = `${n * 0.02}s`;
-      a.innerHTML = `
-        <span class="serif text-2xl font-bold leading-none">${n}</span>
-        <span class="text-[11px] text-[var(--ink)]/60 mt-1.5 text-center px-1">${labelFormat.replace('{n}', n)}</span>
-      `;
-      wrap.appendChild(a);
-    }
-    return wrap;
-  }
+  const isCompact = () => window.matchMedia('(max-width: 639px)').matches;
 
-  function showLessons(level, prefix, count, labelFormat){
-    lessonGrid.innerHTML = '';
-    levelLabel.textContent = levelNames[level];
-    lessonGrid.appendChild(buildLessonTiles(prefix, count, labelFormat));
-
-    pickerSection.classList.add('hidden-panel');
-    lessonPanel.classList.remove('hidden-panel');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function closeAllAccordions(){
-    document.querySelectorAll('.accordion-panel').forEach(panel => {
-      panel.style.maxHeight = '0px';
-      setTimeout(() => panel.remove(), 350);
+  function setTabStyles(){
+    tabButtons.forEach(b => {
+      const on = b.dataset.tab === currentTab;
+      b.classList.toggle('bg-[var(--ink)]', on);
+      b.classList.toggle('text-[var(--paper)]', on);
+      b.classList.toggle('shadow', on);
+      b.setAttribute('aria-selected', on);
     });
-    document.querySelectorAll('.level-card.expanded').forEach(c => c.classList.remove('expanded'));
   }
 
-  function toggleAccordion(card){
-    const alreadyOpen = card.classList.contains('expanded');
-    const existingPanel = card.nextElementSibling && card.nextElementSibling.classList.contains('accordion-panel')
-      ? card.nextElementSibling : null;
+  function closePanel(){
+    document.querySelectorAll('.panel').forEach(p => p.remove());
+    document.querySelectorAll('.series-card.is-open').forEach(c => c.classList.remove('is-open'));
+    openId = null;
+  }
 
-    closeAllAccordions();
-
-    if(alreadyOpen && existingPanel){
-      // was open before this toggle call — just leave it closed
-      return;
-    }
-
-    const count = parseInt(card.dataset.count, 10) || 18;
-    const labelFormat = card.dataset.labelformat || '第{n}課';
-
+  function buildPanel(s){
     const panel = document.createElement('div');
-    panel.className = 'accordion-panel';
-    const inner = document.createElement('div');
-    inner.className = 'accordion-inner';
-    inner.appendChild(buildLessonTiles(card.dataset.prefix, count, labelFormat));
-    panel.appendChild(inner);
+    panel.className = 'panel col-span-full rounded-2xl bg-white border p-4 sm:p-6';
+    panel.style.borderColor = s.color;
+    panel.style.setProperty('--c', s.color);
 
-    card.insertAdjacentElement('afterend', panel);
-    card.classList.add('expanded');
+    const tiles = [];
+    for(let n = 1; n <= s.count; n++){
+      const label = s.label.replace('{n}', n);
+      if(n <= s.avail){
+        tiles.push(`<a href="${s.prefix}${n}.html" class="tile rounded-xl border border-[var(--line)] bg-white py-3 sm:py-4 flex flex-col items-center justify-center" style="--c:${s.color}">
+          <span class="text-xl sm:text-2xl font-bold leading-none" style="color:${s.color}">${n}</span>
+          <span class="text-[10px] sm:text-xs text-[var(--ink)]/50 mt-1">${label}</span></a>`);
+      } else {
+        tiles.push(`<div class="rounded-xl border border-dashed border-[var(--line)] py-3 sm:py-4 flex flex-col items-center justify-center opacity-45" title="Coming soon">
+          <span class="text-xl sm:text-2xl font-bold leading-none">${n}</span>
+          <span class="text-[10px] sm:text-xs mt-1">soon</span></div>`);
+      }
+    }
 
-    requestAnimationFrame(() => {
-      panel.style.maxHeight = panel.scrollHeight + 'px';
+    panel.innerHTML = `
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <p class="font-bold text-base sm:text-lg" style="color:${s.color}">${s.name}</p>
+          <p class="text-xs text-[var(--ink)]/50">${s.sub} · ${s.avail} lessons</p>
+        </div>
+        <button class="close-panel text-xs sm:text-sm px-3 py-1.5 rounded-full border border-[var(--line)] hover:bg-[var(--paper-deep)]">Close ✕</button>
+      </div>
+      <div class="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-9 gap-2 sm:gap-3">${tiles.join('')}</div>`;
+    panel.querySelector('.close-panel').addEventListener('click', closePanel);
+    return panel;
+  }
+
+  function openSeries(s, card){
+    const wasOpen = openId === s.id;
+    closePanel();
+    if(wasOpen) return;
+    openId = s.id;
+    card.classList.add('is-open');
+    const panel = buildPanel(s);
+    if(isCompact()){
+      card.insertAdjacentElement('afterend', panel);   // accordion directly under the tapped card
+    } else {
+      slot.appendChild(panel);                          // below the grid on tablet / desktop
+    }
+    panel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  function renderSeries(){
+    closePanel();
+    grid.innerHTML = '';
+    SERIES[currentTab].forEach(s => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'series-card text-left w-full rounded-2xl bg-white border border-[var(--line)] p-4 sm:p-5 flex items-center gap-4';
+      card.style.setProperty('--c', s.color);
+      card.innerHTML = `
+        <span class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center text-xl sm:text-2xl font-black shrink-0 text-white" style="background:${s.color}">${s.badge}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block font-bold text-base sm:text-lg leading-snug">${s.name}</span>
+          <span class="block text-xs text-[var(--ink)]/55 mt-0.5">${s.sub}</span>
+          <span class="block text-[11px] text-[var(--ink)]/40 mt-1">${s.avail} lessons</span>
+        </span>
+        <svg class="chev w-5 h-5 shrink-0 text-[var(--ink)]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      card.addEventListener('click', () => openSeries(s, card));
+      grid.appendChild(card);
     });
   }
 
-  document.querySelectorAll('.level-card').forEach(card => {
-    const chevron = document.createElement('svg');
-    chevron.setAttribute('viewBox', '0 0 24 24');
-    chevron.setAttribute('fill', 'none');
-    chevron.setAttribute('stroke', 'currentColor');
-    chevron.setAttribute('stroke-width', '2');
-    chevron.className = 'chevron ml-auto sm:hidden';
-    chevron.innerHTML = '<path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>';
-    card.appendChild(chevron);
+  tabButtons.forEach(b => b.addEventListener('click', () => {
+    currentTab = b.dataset.tab;
+    setTabStyles();
+    renderSeries();
+  }));
 
-    card.addEventListener('click', () => {
-      if(isMobile()){
-        toggleAccordion(card);
-      } else {
-        const count = parseInt(card.dataset.count, 10) || 18;
-        const labelFormat = card.dataset.labelformat || '第{n}課';
-        showLessons(card.dataset.level, card.dataset.prefix, count, labelFormat);
-      }
-    });
-  });
+  document.addEventListener('keydown', e => { if(e.key === 'Escape') closePanel(); });
+  window.matchMedia('(max-width: 639px)').addEventListener('change', closePanel);
 
-  window.matchMedia('(max-width: 639px)').addEventListener('change', (e) => {
-    if(!e.matches) closeAllAccordions();
-  });
-
-  backBtn.addEventListener('click', () => {
-    lessonPanel.classList.add('hidden-panel');
-    pickerSection.classList.remove('hidden-panel');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  });
+  setTabStyles();
+  renderSeries();
 </script>
 </body>
 </html>
