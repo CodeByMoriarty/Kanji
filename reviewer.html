@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>ステイアウト前 Table Reviewer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1f5f9;color:#1e293b;font-family:system-ui,"Hiragino Sans","Noto Sans JP",sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+.wrap{max-width:900px;margin:0 auto;padding:12px}
+h1{font-size:20px;margin:0;text-align:center}
+.sub{font-size:12px;color:#64748b;text-align:center;margin:2px 0 8px}
+#tabs{display:flex;gap:4px;overflow-x:auto;padding-bottom:6px}
+.tab{flex:none;padding:6px 12px;border-radius:8px;border:1px solid #cbd5e1;background:#fff;font-size:14px;cursor:pointer}
+.tab.on{background:#1e293b;color:#fff;border-color:#1e293b}
+.tab b{color:#e11d48}.tab.on b{color:#fcd34d}
+.card{background:#fff;border:2px solid #1e293b;border-radius:8px;margin-top:4px}
+.head{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:2px solid #1e293b;background:#f8fafc;border-radius:6px 6px 0 0}
+.pts{font-size:14px}#score{color:#e11d48;font-weight:700;font-size:18px}
+#body{padding:12px}
+.grid2{display:grid;grid-template-columns:1fr;column-gap:24px}
+@media(min-width:700px){.grid2{grid-template-columns:1fr 1fr}}
+.row{display:flex;align-items:flex-end;gap:8px;border-bottom:1px solid #e2e8f0;padding:6px 0}
+.num{width:20px;font-size:12px;color:#94a3b8;padding-bottom:4px}
+.lab{width:128px;flex:none;font-size:14px;font-weight:600;padding-bottom:4px}
+.cell{flex:1;min-width:0}
+.in{width:100%;min-width:0;border:0;border-bottom:2px solid #94a3b8;background:transparent;font-size:18px;padding:2px 4px;outline:none;font-family:inherit}
+.in:focus{border-color:#6366f1}
+.in.ok{border-color:#10b981;background:#ecfdf5}
+.in.bad{border-color:#f43f5e;background:#fff1f2}
+.fix{font-size:12px;color:#e11d48}.fix.show{color:#4338ca}.hidden{display:none}
+.scroll{overflow-x:auto}
+.tbl{width:100%;min-width:640px;border-collapse:collapse}
+.tbl th,.tbl td{border:1px solid #94a3b8;padding:6px}
+.tbl th{background:#f1f5f9;font-size:14px}
+.tbl td.rl{background:#f8fafc;font-weight:600;font-size:14px}
+.bar{display:flex;gap:8px;margin-top:12px;position:sticky;bottom:8px}
+.bar button{flex:1;padding:12px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.15);cursor:pointer}
+.bar #check{background:#4f46e5;color:#fff;border-color:#4f46e5;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ステイアウト前のまとめテスト</h1>
+  <p class="sub">Type the hiragana in each box, then press Check. Enter jumps to the next box. Works offline.</p>
+  <div id="tabs"></div>
+  <div class="card">
+    <div class="head"><div id="title" style="font-weight:700"></div><div class="pts">点数：<span id="score">–</span></div></div>
+    <div id="body"></div>
+  </div>
+  <div class="bar">
+    <button id="check">Check</button><button id="show">Show answers</button><button id="again">New set</button>
+  </div>
+</div>
+<script>
+const D = [];
+const add = (c, t) => t.trim().split("\n").forEach(l => { const [p, a] = l.split("|"); D.push({c, p: p.trim(), a: a.trim()}); });
+add("Months", `February|にがつ
+October|じゅうがつ
+November|じゅういちがつ
+August|はちがつ
+April|しがつ
+September|くがつ
+January|いちがつ
+July|しちがつ
+December|じゅうにがつ
+June|ろくがつ
+May|ごがつ
+March|さんがつ`);
+add("Dates", `30th day|さんじゅうにち
+4th day|よっか
+7th day|なのか
+19th day|じゅうくにち
+14th day|じゅうよっか
+20th day|はつか
+10th day|とおか
+9th day|ここのか
+1st day|ついたち
+29th day|にじゅうくにち
+2nd day|ふつか
+6th day|むいか
+5th day|いつか
+8th day|ようか
+3rd day|みっか
+24th day|にじゅうよっか
+4月10日|しがつとおか
+9月14日|くがつじゅうよっか
+9月7日|くがつなのか`);
+add("Body", `HAIR|かみ
+MIDDLE FINGER|なかゆび
+FOREHEAD|おでこ
+KNEE|ひざ
+NECK|くび
+THUMB|おやゆび
+WRIST|てくび
+FINGERNAIL|つめ
+STOMACH|おなか
+BODY|からだ
+ANKLE|あしくび
+CHEST|むね
+ARM|うで
+CHEEK|ほほ/ほお
+HAND|て
+LITTLE FINGER|こゆび
+ELBOW|ひじ
+TONGUE|した
+WAIST|こし
+RING FINGER|くすりゆび
+LIPS|くちびる
+CHIN|あご
+TIPTOE|つまさき
+MOUTH|くち
+HEAD|あたま
+NOSE|はな
+SHOULDER|かた
+LEG|あし
+THIGH|もも
+FOOT|あし
+EYE|め
+BACK|せなか
+FACE|かお
+EAR|みみ
+HEEL|かかと`);
+add("Counters", `13th floor|じゅうさんかい
+13 houses|じゅうさんげん
+5 chairs|ごきゃく
+6 times|ろっかい
+13 ballpens|じゅうさんぼん
+18 pipes|じゅうはっぽん
+8 cups|はっぱい
+15 cups of glasses|じゅうごはい
+16 small apples|じゅうろっこ
+20 CDs|にじゅうまい
+28 years old|にじゅうはっさい
+8 houses|はっけん
+1st|いちばん
+18 times|じゅうはっかい
+6 houses|ろっけん
+21st floor|にじゅういっかい
+4 persons|よにん
+10 tables|じゅうだい
+13 coffee mugs|じゅうさんばい
+21 pencils|にじゅういっぽん
+20 years old|はたち
+9 papers|きゅうまい
+16 smartphones|じゅうろくだい
+5 cabinets|ごだい
+11 years old|じゅういっさい
+11 T-shirts|じゅういちまい
+20 small oranges|にじゅっこ
+2 kids|ふたり
+1 child|ひとり
+8 televisions|はちだい`);
+add("Position", `Corner (inside)|すみ
+Next|となり
+Left|ひだり
+Down|した
+In front|めのまえ
+Up|うえ
+Right|みぎ
+Straight|まっすぐ
+Center|まんなか
+Near|ちかく
+Front|まえ
+Between|あいだ
+Back|うしろ
+Surroundings|まわり
+Beside|そば
+Side|よこ
+Far|とおく
+Left side|ひだりがわ
+Outside|そと
+Right side|みぎがわ
+Inside|なか`);
+add("Time", `10 minutes|じゅっぷん
+5 minutes|ごふん
+7 minutes|ななふん
+4 minutes|よんぷん
+6 minutes|ろっぷん
+3 minutes|さんぷん
+1 minute|いっぷん
+2 minutes|にふん
+8 minutes|はっぷん
+9 minutes|きゅうふん
+0:59|れいじごじゅうきゅうふん
+12:26|じゅうにじにじゅうろっぷん
+4:30|よじはん
+0:00|れいじ
+7:14|しちじじゅうよんぷん
+9:08|くじはっぷん
+7:00|しちじ
+9:00|くじ
+5:43|ごじよんじゅうさんぷん
+4:00|よじ`);
+
+// verbs: ます, て, たい, ない, じしょ, た
+const V = [["すいます","すって","すいたい","すわない","すう","すった"],
+["かきます","かいて","かきたい","かかない","かく","かいた"],
+["およぎます","およいで","およぎたい","およがない","およぐ","およいだ"],
+["おきます","おきて","おきたい","おきない","おきる","おきた"],
+["しょくじします","しょくじして","しょくじしたい","しょくじしない","しょくじする","しょくじした"],
+["もってきます","もってきて","もってきたい","もってこない","もってくる","もってきた"],
+["もちます","もって","もちたい","もたない","もつ","もった"],
+["みせます","みせて","みせたい","みせない","みせる","みせた"],
+["おります","おりて","おりたい","おりない","おりる","おりた"]];
+// adjectives / nouns: base, negative, past, past negative
+const A = [["あついです","あつくないです","あつかったです","あつくなかったです"],
+["からいです","からくないです","からかったです","からくなかったです"],
+["いいです","よくないです","よかったです","よくなかったです"],
+["たいせつです","たいせつじゃないです/たいせつではありません/たいせつじゃありません","たいせつでした","たいせつじゃなかったです/たいせつではありませんでした/たいせつじゃありませんでした"],
+["きらいです","きらいじゃないです/きらいではありません/きらいじゃありません","きらいでした","きらいじゃなかったです/きらいではありませんでした/きらいじゃありませんでした"],
+["はれです","はれじゃないです/はれじゃありません/はれではありません","はれでした","はれじゃなかったです/はれじゃありませんでした/はれではありませんでした"]];
+
+const SEC = {
+  "1 Counters": {t: "もんだい1　COUNTERS", n: 20, k: "list"},
+  "2 Position": {t: "もんだい2　PREPOSITION", n: 20, k: "list"},
+  "3 Time": {t: "もんだい3　TIME", n: 20, k: "list"},
+  "4 Months·Dates": {t: "もんだい4　MONTHS・CALENDARS", n: 30, k: "list"},
+  "5 Body": {t: "もんだい5　PARTS OF THE BODY", n: 30, k: "list"},
+  "6 Verbs": {t: "もんだい1　VERB CONJUGATION", k: "verb"},
+  "7 Adj·Noun": {t: "もんだい2　ADJECTIVE・NOUN CONJUGATION", k: "adj"}};
+const $ = id => document.getElementById(id);
+const norm = s => s.replace(/[\s　・]/g, "").replace(/[ァ-ン]/g, c => String.fromCharCode(c.charCodeAt(0) - 96));
+const shuffle = a => { a = a.slice(); for (let j = a.length - 1; j > 0; j--) { const k = Math.floor(Math.random() * (j + 1)); [a[j], a[k]] = [a[k], a[j]]; } return a; };
+const pick = (c, n) => shuffle(D.filter(d => d.c === c)).slice(0, n);
+const IC = "in";
+let cur = "1 Counters", cells = [], scores = {};
+
+function cell(a) {
+  const w = document.createElement("div"); w.className = "cell";
+  w.innerHTML = `<input lang="ja" autocomplete="off" autocapitalize="off" class="${IC}"><div class="fix hidden"></div>`;
+  const c = {i: w.firstChild, f: w.lastChild, a}; cells.push(c);
+  c.i.addEventListener("keydown", e => { if (e.key !== "Enter" || e.isComposing) return;
+    const n = cells[cells.indexOf(c) + 1]; n ? n.i.focus() : check(); });
+  return w;
+}
+function listRows(items) {
+  const g = document.createElement("div"); g.className = "grid2";
+  items.forEach((d, k) => { const r = document.createElement("div"); r.className = "row";
+    r.innerHTML = `<span class="num">${k + 1}</span><span class="lab">${d.p}</span>`;
+    r.appendChild(cell(d.a)); g.appendChild(r); });
+  return g;
+}
+function grid(heads, rows, rowLabel) {
+  const w = document.createElement("div"); w.className = "scroll";
+  const t = document.createElement("table"); t.className = "tbl";
+  t.innerHTML = "<thead><tr>" + heads.map(h => `<th>${h}</th>`).join("") + "</tr></thead>";
+  const tb = document.createElement("tbody");
+  rows.forEach(r => { const tr = document.createElement("tr");
+    tr.innerHTML = `<td class="rl">${r[0]}</td>`;
+    r.slice(1).forEach(a => { const td = document.createElement("td"); td.appendChild(cell(a)); tr.appendChild(td); });
+    tb.appendChild(tr); });
+  t.appendChild(tb); w.appendChild(t); return w;
+}
+function render() {
+  const s = SEC[cur]; cells = []; $("title").textContent = s.t; $("score").textContent = "–"; $("check").textContent = "Check";
+  const b = $("body"); b.innerHTML = "";
+  if (s.k === "list") {
+    const items = cur === "4 Months·Dates" ? [...pick("Months", 12), ...pick("Dates", 18)]
+      : cur === "1 Counters" ? pick("Counters", 20) : cur === "2 Position" ? pick("Position", 20)
+      : cur === "3 Time" ? pick("Time", 20) : pick("Body", 30);
+    b.appendChild(listRows(items));
+  } else if (s.k === "verb") {
+    b.appendChild(grid(["ます FORM", "て FORM", "たい FORM", "ない FORM", "じしょ FORM", "た FORM"],
+      shuffle(V).slice(0, 6).map(v => [v[0], v[1], v[2], v[3], v[4], v[5]])));
+  } else {
+    b.appendChild(grid(["です", "ない (negative)", "た (past)", "なかった (past negative)"], shuffle(A).slice(0, 5)));
+  }
+  tabs(); cells[0] && cells[0].i.focus();
+}
+function check() {
+  let ok = 0;
+  cells.forEach(c => { const good = c.a.split("/").some(x => norm(x) === norm(c.i.value)); if (good) ok++;
+    c.i.className = IC + (good ? " ok" : " bad");
+    c.f.classList.toggle("hidden", good); c.f.textContent = good ? "" : "→ " + c.a.split("/").join(" / "); });
+  scores[cur] = ok + "/" + cells.length; $("score").textContent = scores[cur]; tabs();
+}
+function show() { cells.forEach(c => { c.f.classList.remove("hidden"); c.f.className = "fix show"; c.f.textContent = "→ " + c.a.split("/").join(" / "); }); }
+function tabs() {
+  $("tabs").innerHTML = "";
+  Object.keys(SEC).forEach(k => { const b = document.createElement("button");
+    b.className = "tab" + (k === cur ? " on" : "");
+    b.innerHTML = k + (scores[k] ? ` <b>${scores[k]}</b>` : "");
+    b.onclick = () => { cur = k; render(); }; $("tabs").appendChild(b); });
+}
+$("check").onclick = check; $("show").onclick = show; $("again").onclick = render;
+render();
+</script>
+</body></html>
