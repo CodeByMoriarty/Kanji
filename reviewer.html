@@ -35,24 +35,33 @@ h1{font-size:20px;margin:0;text-align:center}
 .bar button{flex:1;padding:12px;border-radius:12px;border:1px solid #cbd5e1;background:#fff;font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.15);cursor:pointer}
 .bar #check{background:#4f46e5;color:#fff;border-color:#4f46e5;font-weight:600}
 .modes{display:flex;gap:6px;justify-content:center;margin-bottom:8px}
-.fc{text-align:center;padding:12px 4px}.fcn{font-size:12px;color:#94a3b8}
-.fq{font-size:32px;font-weight:700;margin:12px 0;word-break:break-word}
-.fcat{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#4f46e5;margin-bottom:12px}
-.fin{text-align:center;font-size:22px;max-width:360px}
-.fres{min-height:44px;margin:10px 0;font-size:20px}
-.fbtn{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-.fbtn button{padding:10px 14px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:14px;cursor:pointer}
-.fbtn .pri{background:#4f46e5;color:#fff;border-color:#4f46e5}
-.fcard{perspective:1000px;margin:8px auto;max-width:420px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
-.flipper{position:relative;height:220px;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
-.fcard.open .flipper{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px}
-.face .fcat,.face .fq{margin:0}.face .fq{margin:10px 0}
-.front{background:#eef2ff;border:2px dashed #a5b4fc}
-.back{background:#fff;border:2px solid #6366f1;transform:rotateY(180deg)}
-.tap{font-size:13px;color:#94a3b8}
-@media(prefers-reduced-motion:reduce){.flipper{transition:none}}
-.fa{font-size:30px;font-weight:700;color:#4338ca;margin-top:12px;min-height:40px;word-break:break-word}.fa.hint{font-size:13px;font-weight:400;color:#94a3b8}
+.fx{max-width:460px;margin:0 auto}
+.fx-prog{height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.fx-prog i{display:block;height:100%;background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:99px;transition:width .3s}
+.fx-top{display:flex;justify-content:space-between;font-size:13px;color:#64748b;margin:8px 2px 12px}
+.fx-top .g{color:#059669}.fx-top .r{color:#e11d48}
+.fx-card{perspective:1200px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.fx-flip{position:relative;height:250px;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.fx-card.open .fx-flip{transform:rotateY(180deg)}
+.fx-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:18px;text-align:center;box-shadow:0 10px 25px -8px rgba(79,70,229,.45)}
+.fx-front{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff}
+.fx-back{background:#fff;border:3px solid #6366f1;transform:rotateY(180deg);color:#312e81}
+.fx-q{font-size:32px;font-weight:800;line-height:1.2;word-break:break-word}
+.fx-a{font-size:34px;font-weight:800;word-break:break-word}
+.fx-pill{font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:99px}
+.fx-pill.alt{background:#eef2ff;color:#4f46e5}
+.fx-tap{font-size:12px;opacity:.7;position:absolute;bottom:14px}
+.fx-main{display:flex;gap:10px;margin:16px 0 12px}
+.fx-btn{flex:1;padding:14px 8px;border-radius:14px;border:0;font-size:16px;font-weight:700;cursor:pointer;transition:transform .1s,opacity .2s;font-family:inherit}
+.fx-btn:active{transform:scale(.96)}.fx-btn:disabled{opacity:.35;cursor:not-allowed}
+.fx-btn.pri{background:#4f46e5;color:#fff;flex:1.2}.fx-btn.no{background:#ffe4e6;color:#be123c}.fx-btn.yes{background:#d1fae5;color:#047857}.fx-btn.ghost{background:#e2e8f0;color:#334155}
+.fx-nav{display:flex;align-items:center;gap:8px}
+.fx-round{width:44px;height:44px;flex:none;border-radius:50%;border:1px solid #cbd5e1;background:#fff;font-size:24px;line-height:1;cursor:pointer}
+.fx-chips{flex:1;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.fx-chips button{padding:8px 12px;border-radius:99px;border:1px solid #cbd5e1;background:#fff;font-size:13px;cursor:pointer;font-family:inherit}
+.fin{text-align:center;font-size:22px;margin-top:14px}
+.fres{min-height:40px;margin:8px 0 0;font-size:20px;text-align:center}
+@media(prefers-reduced-motion:reduce){.fx-flip{transition:none}}
 .remarks{margin-top:12px;padding:10px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;font-size:14px;line-height:1.5}
 .remarks ul{margin:6px 0 0;padding-left:20px}
 </style>
@@ -290,7 +299,7 @@ function render() {
     b.appendChild(grid(["です", "ない (negative)", "た (past)", "なかった (past negative)"], shuffle(isAdj ? A.slice(0, 3) : A.slice(3))));
     const r = document.createElement("div"); r.className = "remarks";
     r.innerHTML = isAdj
-      ? `<b>Remarks（い-adjectives）</b><ul><li>ない: drop <b>い</b> → <b>くないです</b> (あつい → あつくないです)</li><li>past: drop <b>い</b> → <b>かったです</b></li><li>past negative: drop <b>い</b> → <b>くなかったです</b></li><li>⚠ <b>いいです</b> is irregular: it uses <b>よ</b> → よくないです, よかったです, よくなかったです</li></ul>`
+      ? `<b>Remarks（い-adjectives）</b><ul><li>ない: drop <b>い</b> → <b>くないです</b> (あつい → あつくないです)</li><li>past: drop <b>い</b> → <b>かったです</b></li><li>past negative: drop <b>い</b> → <b>くなかったです</b></li><li><b>いいです</b> is irregular: it uses <b>よ</b> → よくないです, よかったです, よくなかったです</li></ul>`
       : `<b>Remarks（nouns / な-adjectives）</b><ul><li>negative: <b>じゃないです</b> / <b>ではありません</b> / <b>じゃありません</b></li><li>past: <b>でした</b></li><li>past negative: <b>じゃなかったです</b> / <b>ではありませんでした</b> / <b>じゃありませんでした</b></li><li>たいせつ and きらい are な-adjectives, but they conjugate the same way as nouns like はれ.</li></ul>`;
     b.appendChild(r);
   }
@@ -313,49 +322,57 @@ function tabs() {
     b.onclick = () => { if (mode === "flash") { fcat = k; fnew(); } else { cur = k; render(); } }; $("tabs").appendChild(b); });
 }
 $("check").onclick = check; $("show").onclick = show; $("again").onclick = render;
+// Counter suffixes (from the textbook page): [kanji, meaning, readings 1-10 + ?]
+const CS = [
+["人","persons",["ひとり","ふたり","さんにん","よにん","ごにん","ろくにん","ななにん/しちにん","はちにん","きゅうにん","じゅうにん","なんにん"]],
+["番","order",["いちばん","にばん","さんばん","よんばん","ごばん","ろくばん","ななばん","はちばん","きゅうばん","じゅうばん","なんばん"]],
+["枚","thin and flat things",["いちまい","にまい","さんまい","よんまい","ごまい","ろくまい","ななまい","はちまい","きゅうまい","じゅうまい","なんまい"]],
+["台","machines and vehicles",["いちだい","にだい","さんだい","よんだい","ごだい","ろくだい","ななだい","はちだい","きゅうだい","じゅうだい","なんだい"]],
+["歳","age",["いっさい","にさい","さんさい","よんさい","ごさい","ろくさい","ななさい","はっさい","きゅうさい","じゅっさい/じっさい","なんさい"]],
+["冊","books and notebooks",["いっさつ","にさつ","さんさつ","よんさつ","ごさつ","ろくさつ","ななさつ","はっさつ","きゅうさつ","じゅっさつ/じっさつ","なんさつ"]],
+["着","clothes",["いっちゃく","にちゃく","さんちゃく","よんちゃく","ごちゃく","ろくちゃく","ななちゃく","はっちゃく","きゅうちゃく","じゅっちゃく/じっちゃく","なんちゃく"]],
+["軒","houses",["いっけん","にけん","さんげん","よんけん","ごけん","ろっけん","ななけん","はっけん","きゅうけん","じゅっけん/じっけん","なんげん"]],
+["足","shoes and socks",["いっそく","にそく","さんぞく","よんそく","ごそく","ろくそく","ななそく","はっそく","きゅうそく","じゅっそく/じっそく","なんぞく"]],
+["個","small things",["いっこ","にこ","さんこ","よんこ","ごこ","ろっこ","ななこ","はっこ","きゅうこ","じゅっこ/じっこ","なんこ"]],
+["回","frequency",["いっかい","にかい","さんかい","よんかい","ごかい","ろっかい","ななかい","はっかい","きゅうかい","じゅっかい/じっかい","なんかい"]],
+["階","floors of a building",["いっかい","にかい","さんがい","よんかい","ごかい","ろっかい","ななかい","はっかい","きゅうかい","じゅっかい/じっかい","なんがい"]],
+["本","thin and long things",["いっぽん","にほん","さんぼん","よんほん","ごほん","ろっぽん","ななほん","はっぽん","きゅうほん","じゅっぽん/じっぽん","なんぼん"]],
+["杯","cups and glasses",["いっぱい","にはい","さんばい","よんはい","ごはい","ろっぱい","ななはい","はっぱい","きゅうはい","じゅっぱい/じっぱい","なんばい"]],
+["匹","small animals, fish, insects",["いっぴき","にひき","さんびき","よんひき","ごひき","ろっぴき","ななひき","はっぴき","きゅうひき","じゅっぴき/じっぴき","なんびき"]]];
+CS.forEach(([k, l, r]) => r.forEach((a, i) => D.push({c: "Counter Suffix", p: (i < 10 ? i + 1 : "?") + " " + k + " (" + l + ")", a})));
 let mode = "table", fmode = "flip", fdeck = [], fi = 0, fok = 0, ftry = 0, fdone = false, fcat = "1 Counters"; const fmiss = new Set();
-const POOL = {"1 Counters": ["Counters"], "2 Position": ["Position"], "3 Time": ["Time"], "4 Months·Dates": ["Months", "Dates"], "5 Body": ["Body"], "All": ["Counters", "Position", "Time", "Months", "Dates", "Body"]};
+const POOL = {"1 Counters": ["Counters"], "2 Position": ["Position"], "3 Time": ["Time"], "4 Months·Dates": ["Months", "Dates"], "5 Body": ["Body"], "6 Counter Suffixes": ["Counter Suffix"], "Everything": ["Counters", "Position", "Time", "Months", "Dates", "Body", "Counter Suffix"]};
 function fnew(list) { fdeck = list || shuffle(D.filter(d => POOL[fcat].includes(d.c))); fi = 0; fok = 0; ftry = 0; tabs(); fshow(); }
-function fshow() {
-  if (fmode === "flip") return fflip();
-  const d = fdeck[fi]; fdone = false; $("title").textContent = "FLASHCARDS　" + fcat; $("score").textContent = fok + "/" + ftry;
-  $("body").innerHTML = `<div class="fc"><div class="fcn">${fi + 1} / ${fdeck.length}</div><div class="fq">${d.p}</div><div class="fcat">${d.c}</div>
-  <input id="fin" lang="ja" autocomplete="off" autocapitalize="off" class="in fin" placeholder="ひらがな"><div id="fres" class="fres"></div>
-  <div class="fbtn"><button id="fprev">← Prev</button><button id="fchk" class="pri">Check</button><button id="frev">Show answer</button><button id="fnext">Next →</button></div>
-  <div class="fbtn"><button id="fshuf">Shuffle</button><button id="fmode">Switch to flip cards</button><button id="fmiss">Review missed (${fmiss.size})</button></div></div>`;
-  const ans = () => d.a.split("/").join(" / ");
-  const score = good => { if (!fdone) { fdone = true; ftry++; if (good) { fok++; fmiss.delete(d); } else fmiss.add(d); } $("score").textContent = fok + "/" + ftry; $("fmiss").textContent = "Review missed (" + fmiss.size + ")"; };
+const fx = {
+  head: () => `<div class="fx-prog"><i style="width:${(fi + 1) / fdeck.length * 100}%"></i></div><div class="fx-top"><span>${fi + 1} / ${fdeck.length}</span><span><b class="g">✓ ${fok}</b> <b class="r">✗ ${ftry - fok}</b></span></div>`,
+  tools: () => `<div class="fx-nav"><button class="fx-round" id="fprev" aria-label="Previous">‹</button><div class="fx-chips"><button id="fshuf">Shuffle</button><button id="fmode">${fmode === "flip" ? "Typing" : "Flip cards"}</button><button id="fmiss">Missed (${fmiss.size})</button></div><button class="fx-round" id="fnext" aria-label="Next">›</button></div>`
+};
+function fwire() {
+  $("fprev").onclick = fprev; $("fnext").onclick = fnext;
+  $("fshuf").onclick = () => { fdeck = shuffle(fdeck); fi = 0; fshow(); };
+  $("fmiss").onclick = () => fmiss.size ? fnew([...fmiss]) : alert("No missed cards yet!");
+  $("fmode").onclick = () => { fmode = fmode === "flip" ? "type" : "flip"; fshow(); };
+}
+function fprev() { if (fi > 0) fi--; fshow(); }
+function fshow() { return fmode === "flip" ? fflip() : ftype(); }
+function fhead() { $("title").textContent = "FLASHCARDS　" + fcat; $("score").textContent = fok + "/" + ftry; }
+function ftype() {
+  const d = fdeck[fi]; fdone = false; fhead();
+  $("body").innerHTML = `<div class="fx">${fx.head()}<div class="fx-card" style="cursor:default"><div class="fx-flip"><div class="fx-face fx-front"><span class="fx-pill">${d.c}</span><div class="fx-q">${d.p}</div></div></div></div>
+  <input id="fin" lang="ja" autocomplete="off" autocapitalize="off" class="in fin" placeholder="ひらがなで入力"><div id="fres" class="fres"></div>
+  <div class="fx-main"><button id="frev" class="fx-btn ghost">Show answer</button><button id="fchk" class="fx-btn pri">Check</button></div>${fx.tools()}</div>`;
+  const ans = d.a.split("/").join(" / ");
+  const score = good => { if (!fdone) { fdone = true; ftry++; if (good) { fok++; fmiss.delete(d); } else fmiss.add(d); } fhead(); $("fmiss").textContent = "Missed (" + fmiss.size + ")"; };
   const chk = () => { if (fdone) return fnext(); const good = d.a.split("/").some(x => norm(x) === norm($("fin").value));
     score(good); $("fin").className = "in fin " + (good ? "ok" : "bad");
-    $("fres").innerHTML = good ? `<span style="color:#059669">✓ ${ans()}</span>` : `<span style="color:#e11d48">✗</span> ${ans()}`; };
+    $("fres").innerHTML = good ? `<span style="color:#059669">✓ ${ans}</span>` : `<span style="color:#e11d48">✗</span> ${ans}`; };
   $("fchk").onclick = chk;
   $("fin").addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) chk(); });
-  $("frev").onclick = () => { score(false); $("fres").innerHTML = `<span style="color:#4338ca">${ans()}</span>`; };
-  $("fprev").onclick = () => { if (fi > 0) fi--; fshow(); };
-  $("fnext").onclick = fnext;
-  $("fshuf").onclick = () => { fdeck = shuffle(fdeck); fi = 0; fshow(); };
-  $("fmiss").onclick = () => fmiss.size ? fnew([...fmiss]) : alert("No missed cards yet!");
-  $("fmode").onclick = () => { fmode = "flip"; fshow(); };
-  $("fin").focus();
+  $("frev").onclick = () => { score(false); $("fres").innerHTML = `<span style="color:#4338ca">${ans}</span>`; };
+  fwire(); $("fin").focus();
 }
 function fflip() {
-  const d = fdeck[fi]; fdone = false; $("title").textContent = "FLASHCARDS　" + fcat; $("score").textContent = fok + "/" + ftry;
-  $("body").innerHTML = `<div class="fc"><div class="fcn">${fi + 1} / ${fdeck.length}</div>
-  <div id="fcard" class="fcard"><div class="flipper"><div class="face front"><div class="fcat">${d.c}</div><div class="fq">${d.p}</div><div class="tap">Tap the card to flip</div></div><div class="face back"><div class="fcat">${d.p}</div><div class="fa">${d.a.split("/").join(" / ")}</div></div></div></div>
-  <div id="fj" class="fbtn hidden"><button id="fno">Again</button><button id="fyes" class="pri">Got it</button></div>
-  <div class="fbtn"><button id="fprev">← Prev</button><button id="fnext">Next →</button></div>
-  <div class="fbtn"><button id="fshuf">Shuffle</button><button id="fmode">Switch to typing</button><button id="fmiss">Review missed (${fmiss.size})</button></div></div>`;
-  const open = () => { $("fcard").classList.toggle("open"); $("fj").classList.remove("hidden"); };
-  const judge = good => { if (!fdone) { fdone = true; ftry++; if (good) { fok++; fmiss.delete(d); } else fmiss.add(d); } fnext(); };
-  $("fcard").onclick = open; $("fno").onclick = () => judge(false); $("fyes").onclick = () => judge(true);
-  $("fprev").onclick = () => { if (fi > 0) fi--; fshow(); }; $("fnext").onclick = fnext;
-  $("fshuf").onclick = () => { fdeck = shuffle(fdeck); fi = 0; fshow(); };
-  $("fmiss").onclick = () => fmiss.size ? fnew([...fmiss]) : alert("No missed cards yet!");
-  $("fmode").onclick = () => { fmode = "type"; fshow(); };
-}
-function fnext() { if (fi < fdeck.length - 1) fi++; else { alert("End of deck!"); fi = 0; } fshow(); }
-function setMode(m) { mode = m; $("mT").className = "tab" + (m === "table" ? " on" : ""); $("mF").className = "tab" + (m === "flash" ? " on" : ""); render(); }
-$("mT").onclick = () => setMode("table"); $("mF").onclick = () => setMode("flash");
-render();
-</script>
-</body></html>
+  const d = fdeck[fi]; fdone = false; fhead();
+  $("body").innerHTML = `<div class="fx">${fx.head()}<div id="fcard" class="fx-card"><div class="fx-flip"><div class="fx-face fx-front"><span class="fx-pill">${d.c}</span><div class="fx-q">${d.p}</div><div class="fx-tap">Tap to flip</div></div><div class="fx-face fx-back"><span class="fx-pill alt">${d.p}</span><div class="fx-a">${d.a.split("/").join(" / ")}</div></div></div></div>
+  <div class="fx-main"><button id="fno" class="fx-btn no" disabled>✗ Again</button><button id="fturn" class="fx-btn pri">⟳ Flip</button><button id="fyes" class="fx-btn yes" disabled>✓ Got it</button></div>${fx.tools()}</div>`;
+  const turn = () => { const o = $("fcard").classList.toggle("open"); $("fno").disabled = $("fyes").disabled = !o; 
