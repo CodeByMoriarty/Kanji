@@ -53,6 +53,8 @@ h1{font-size:20px;margin:0;text-align:center}
 .tap{font-size:13px;color:#94a3b8}
 @media(prefers-reduced-motion:reduce){.flipper{transition:none}}
 .fa{font-size:30px;font-weight:700;color:#4338ca;margin-top:12px;min-height:40px;word-break:break-word}.fa.hint{font-size:13px;font-weight:400;color:#94a3b8}
+.remarks{margin-top:12px;padding:10px 14px;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;font-size:14px;line-height:1.5}
+.remarks ul{margin:6px 0 0;padding-left:20px}
 </style>
 </head>
 <body>
@@ -235,7 +237,8 @@ const SEC = {
   "4 Months·Dates": {t: "もんだい4　MONTHS・CALENDARS", n: 30, k: "list"},
   "5 Body": {t: "もんだい5　PARTS OF THE BODY", n: 30, k: "list"},
   "6 Verbs": {t: "もんだい1　VERB CONJUGATION", k: "verb"},
-  "7 Adj·Noun": {t: "もんだい2　ADJECTIVE・NOUN CONJUGATION", k: "adj"}};
+  "7 Adjective": {t: "もんだい2　ADJECTIVE CONJUGATION", k: "adj"},
+  "8 Noun": {t: "もんだい2　NOUN CONJUGATION", k: "adj"}};
 const $ = id => document.getElementById(id);
 const norm = s => s.replace(/[\s　・]/g, "").replace(/[ァ-ン]/g, c => String.fromCharCode(c.charCodeAt(0) - 96));
 const shuffle = a => { a = a.slice(); for (let j = a.length - 1; j > 0; j--) { const k = Math.floor(Math.random() * (j + 1)); [a[j], a[k]] = [a[k], a[j]]; } return a; };
@@ -283,7 +286,13 @@ function render() {
     b.appendChild(grid(["ます FORM", "て FORM", "たい FORM", "ない FORM", "じしょ FORM", "た FORM"],
       shuffle(V).slice(0, 6).map(v => [v[0], v[1], v[2], v[3], v[4], v[5]])));
   } else {
-    b.appendChild(grid(["です", "ない (negative)", "た (past)", "なかった (past negative)"], shuffle(A).slice(0, 5)));
+    const isAdj = cur === "7 Adjective";
+    b.appendChild(grid(["です", "ない (negative)", "た (past)", "なかった (past negative)"], shuffle(isAdj ? A.slice(0, 3) : A.slice(3))));
+    const r = document.createElement("div"); r.className = "remarks";
+    r.innerHTML = isAdj
+      ? `<b>Remarks（い-adjectives）</b><ul><li>ない: drop <b>い</b> → <b>くないです</b> (あつい → あつくないです)</li><li>past: drop <b>い</b> → <b>かったです</b></li><li>past negative: drop <b>い</b> → <b>くなかったです</b></li><li>⚠ <b>いいです</b> is irregular: it uses <b>よ</b> → よくないです, よかったです, よくなかったです</li></ul>`
+      : `<b>Remarks（nouns / な-adjectives）</b><ul><li>negative: <b>じゃないです</b> / <b>ではありません</b> / <b>じゃありません</b></li><li>past: <b>でした</b></li><li>past negative: <b>じゃなかったです</b> / <b>ではありませんでした</b> / <b>じゃありませんでした</b></li><li>たいせつ and きらい are な-adjectives, but they conjugate the same way as nouns like はれ.</li></ul>`;
+    b.appendChild(r);
   }
   tabs(); cells[0] && cells[0].i.focus();
 }
