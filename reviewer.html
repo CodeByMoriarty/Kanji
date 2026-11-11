@@ -43,8 +43,15 @@ h1{font-size:20px;margin:0;text-align:center}
 .fbtn{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
 .fbtn button{padding:10px 14px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;font-size:14px;cursor:pointer}
 .fbtn .pri{background:#4f46e5;color:#fff;border-color:#4f46e5}
-.fcard{border:2px dashed #a5b4fc;border-radius:16px;padding:24px 12px;margin:8px auto;max-width:420px;min-height:200px;cursor:pointer;background:#eef2ff;user-select:none}
-.fcard.open{background:#fff;border-style:solid;border-color:#6366f1}
+.fcard{perspective:1000px;margin:8px auto;max-width:420px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+.flipper{position:relative;height:220px;transition:transform .6s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+.fcard.open .flipper{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px}
+.face .fcat,.face .fq{margin:0}.face .fq{margin:10px 0}
+.front{background:#eef2ff;border:2px dashed #a5b4fc}
+.back{background:#fff;border:2px solid #6366f1;transform:rotateY(180deg)}
+.tap{font-size:13px;color:#94a3b8}
+@media(prefers-reduced-motion:reduce){.flipper{transition:none}}
 .fa{font-size:30px;font-weight:700;color:#4338ca;margin-top:12px;min-height:40px;word-break:break-word}.fa.hint{font-size:13px;font-weight:400;color:#94a3b8}
 </style>
 </head>
@@ -298,9 +305,7 @@ function tabs() {
 }
 $("check").onclick = check; $("show").onclick = show; $("again").onclick = render;
 let mode = "table", fmode = "flip", fdeck = [], fi = 0, fok = 0, ftry = 0, fdone = false, fcat = "1 Counters"; const fmiss = new Set();
-const POOL = {"1 Counters": ["Counters"], "2 Position": ["Position"], "3 Time": ["Time"], "4 Months·Dates": ["Months", "Dates"], "5 Body": ["Body"], "6 Verbs": ["Verbs"], "7 Adj·Noun": ["Adj"], "All": ["Counters", "Position", "Time", "Months", "Dates", "Body", "Verbs", "Adj"]};
-V.forEach(v => ["て form","たい form","ない form","じしょ form","た form"].forEach((n, i) => D.push({c: "Verbs", p: v[0] + " → " + n, a: v[i + 1]})));
-A.forEach(v => ["negative","past","past negative"].forEach((n, i) => D.push({c: "Adj", p: v[0] + " → " + n, a: v[i + 1]})));
+const POOL = {"1 Counters": ["Counters"], "2 Position": ["Position"], "3 Time": ["Time"], "4 Months·Dates": ["Months", "Dates"], "5 Body": ["Body"], "All": ["Counters", "Position", "Time", "Months", "Dates", "Body"]};
 function fnew(list) { fdeck = list || shuffle(D.filter(d => POOL[fcat].includes(d.c))); fi = 0; fok = 0; ftry = 0; tabs(); fshow(); }
 function fshow() {
   if (fmode === "flip") return fflip();
@@ -327,11 +332,11 @@ function fshow() {
 function fflip() {
   const d = fdeck[fi]; fdone = false; $("title").textContent = "FLASHCARDS　" + fcat; $("score").textContent = fok + "/" + ftry;
   $("body").innerHTML = `<div class="fc"><div class="fcn">${fi + 1} / ${fdeck.length}</div>
-  <div id="fcard" class="fcard"><div class="fcat">${d.c}</div><div class="fq">${d.p}</div><div id="fa" class="fa hint">Tap the card to flip</div></div>
+  <div id="fcard" class="fcard"><div class="flipper"><div class="face front"><div class="fcat">${d.c}</div><div class="fq">${d.p}</div><div class="tap">Tap the card to flip</div></div><div class="face back"><div class="fcat">${d.p}</div><div class="fa">${d.a.split("/").join(" / ")}</div></div></div></div>
   <div id="fj" class="fbtn hidden"><button id="fno">Again</button><button id="fyes" class="pri">Got it</button></div>
   <div class="fbtn"><button id="fprev">← Prev</button><button id="fnext">Next →</button></div>
   <div class="fbtn"><button id="fshuf">Shuffle</button><button id="fmode">Switch to typing</button><button id="fmiss">Review missed (${fmiss.size})</button></div></div>`;
-  const open = () => { $("fcard").classList.add("open"); $("fa").className = "fa"; $("fa").textContent = d.a.split("/").join(" / "); $("fj").classList.remove("hidden"); };
+  const open = () => { $("fcard").classList.toggle("open"); $("fj").classList.remove("hidden"); };
   const judge = good => { if (!fdone) { fdone = true; ftry++; if (good) { fok++; fmiss.delete(d); } else fmiss.add(d); } fnext(); };
   $("fcard").onclick = open; $("fno").onclick = () => judge(false); $("fyes").onclick = () => judge(true);
   $("fprev").onclick = () => { if (fi > 0) fi--; fshow(); }; $("fnext").onclick = fnext;
