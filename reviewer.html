@@ -375,4 +375,19 @@ function fflip() {
   const d = fdeck[fi]; fdone = false; fhead();
   $("body").innerHTML = `<div class="fx">${fx.head()}<div id="fcard" class="fx-card"><div class="fx-flip"><div class="fx-face fx-front"><span class="fx-pill">${d.c}</span><div class="fx-q">${d.p}</div><div class="fx-tap">Tap to flip</div></div><div class="fx-face fx-back"><span class="fx-pill alt">${d.p}</span><div class="fx-a">${d.a.split("/").join(" / ")}</div></div></div></div>
   <div class="fx-main"><button id="fno" class="fx-btn no" disabled>✗ Again</button><button id="fturn" class="fx-btn pri">⟳ Flip</button><button id="fyes" class="fx-btn yes" disabled>✓ Got it</button></div>${fx.tools()}</div>`;
-  const turn = () => { const o = $("fcard").classList.toggle("open"); $("fno").disabled = $("fyes").disabled = !o; 
+  const turn = () => { const o = $("fcard").classList.toggle("open"); $("fno").disabled = $("fyes").disabled = !o; };
+  const judge = good => { if (!fdone) { fdone = true; ftry++; if (good) { fok++; fmiss.delete(d); } else fmiss.add(d); } fnext(); };
+  $("fcard").onclick = turn; $("fturn").onclick = turn; $("fno").onclick = () => judge(false); $("fyes").onclick = () => judge(true);
+  fwire();
+}
+document.addEventListener("keydown", e => {
+  if (mode !== "flash" || fmode !== "flip" || !$("fcard")) return;
+  if (e.key === " " || e.key === "Enter") { e.preventDefault(); $("fturn").click(); }
+  else if (e.key === "ArrowRight") fnext(); else if (e.key === "ArrowLeft") fprev();
+});
+function fnext() { if (fi < fdeck.length - 1) fi++; else { alert("End of deck!"); fi = 0; } fshow(); }
+function setMode(m) { mode = m; $("mT").className = "tab" + (m === "table" ? " on" : ""); $("mF").className = "tab" + (m === "flash" ? " on" : ""); render(); }
+$("mT").onclick = () => setMode("table"); $("mF").onclick = () => setMode("flash");
+render();
+</script>
+</body></html
